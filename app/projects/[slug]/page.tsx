@@ -15,6 +15,7 @@ import {
 import { getLocalities } from "@/lib/localities";
 import EnquiryForm from "@/components/EnquiryForm";
 import ViewTracker from "@/components/ViewTracker";
+import { buildWhatsAppLink } from "@/lib/whatsapp";
 
 interface Locality {
   name: string;
@@ -170,6 +171,10 @@ export default async function ProjectPage({
   }, null);
 
   const heroImage = media.find((m) => m.kind === "image");
+
+  const whatsAppLink = buildWhatsAppLink(
+    `Hi, I'm interested in ${project.name} in ${project.localities?.name ?? "Hyderabad"}. Can you share more details?`
+  );
 
   return (
     <div className="flex-1" style={{ background: "var(--paper)" }}>
@@ -377,6 +382,17 @@ export default async function ProjectPage({
             >
               {startingPrice != null ? formatINR(startingPrice) : "Price on request"}
             </div>
+            {whatsAppLink && (
+              <a
+                href={whatsAppLink}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mt-3 flex w-full items-center justify-center gap-2 rounded-md py-2.5 text-sm font-bold text-white"
+                style={{ background: "#128C7E" }}
+              >
+                Ask on WhatsApp
+              </a>
+            )}
           </div>
 
           <div

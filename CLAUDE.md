@@ -264,12 +264,22 @@ and talking to buyers, not polish.
       cross-origin `fetch` calls at all, so don't rely on it for verifying
       Supabase calls in future sessions).
 
+- [x] WhatsApp click-to-chat (step 9). `lib/whatsapp.ts` builds a `wa.me`
+      link with the message pre-filled with the project name and locality;
+      rendered as a green "Ask on WhatsApp" button on the project page,
+      right under the starting price. Reads `NEXT_PUBLIC_WHATSAPP_NUMBER`
+      from env and renders nothing if it's unset, so a missing number never
+      shows a dead button. The number is a dedicated second SIM on WhatsApp
+      Business (not a VoIP number — those get flagged/banned by WhatsApp's
+      anti-fraud checks, which is a bad risk for the number leads actually
+      call), registered by the operator this session: `918897327276`.
+
 ### Notes for next session
 
-- `.env.local` is filled in with the real Supabase URL/anon key. WhatsApp
-  number and RERA agent number env vars are still blank — fill in
-  `NEXT_PUBLIC_WHATSAPP_NUMBER` and `NEXT_PUBLIC_RERA_AGENT_NUMBER` in
-  `.env.local` once known (never commit this file — it's gitignored).
+- `.env.local` is filled in with the real Supabase URL/anon key and
+  WhatsApp number. RERA agent number env var is still blank — fill in
+  `NEXT_PUBLIC_RERA_AGENT_NUMBER` in `.env.local` once known (never commit
+  this file — it's gitignored).
 - Only `localities` was seeded from `seed-localities.sql`. One test project
   ("Aranya Skyline", Gachibowli) and one test listing were inserted by hand
   via the Supabase SQL editor to verify rendering — real project/listing data
