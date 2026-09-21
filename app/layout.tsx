@@ -22,13 +22,27 @@ const ibmPlexMono = IBM_Plex_Mono({
   weight: ["400", "500", "600"],
 });
 
+const BASE_URL = "https://homyrealty.com";
+
 export const metadata: Metadata = {
+  metadataBase: new URL(BASE_URL),
   title: {
     default: "AJ FairDeal Realty — Hyderabad Apartments & Villas",
     template: "%s | AJ FairDeal Realty",
   },
   description:
     "Honest, well-structured listings of new-launch and resale apartments and villas across Hyderabad.",
+};
+
+const organizationJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "RealEstateAgent",
+  name: "AJ FairDeal Realty",
+  url: BASE_URL,
+  areaServed: {
+    "@type": "City",
+    name: "Hyderabad",
+  },
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
@@ -38,6 +52,10 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       className={`${bricolage.variable} ${ibmPlexSans.variable} ${ibmPlexMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd) }}
+        />
         <Suspense fallback={null}>
           <Analytics />
         </Suspense>

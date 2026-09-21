@@ -348,23 +348,28 @@ and talking to buyers, not polish.
       page groups correctly by zone, Gachibowli shows the one real listing
       with the right SEO title, Kokapet (no listings) shows the empty
       state, and an invalid slug 404s properly.
-- [~] Step 12 (deploy, domain, sitemap, robots.txt, JSON-LD) — **mostly
-      done**. **The site is live at https://homyrealty.com** — domain
-      bought via Cloudflare Registrar, code on GitHub
-      (`akyapada/aj_fairdeal_realty`), deployed to Cloudflare Workers via
-      the OpenNext adapter (`@cloudflare/next-on-pages` doesn't support
-      Next.js 16 yet, so this uses `@opennextjs/cloudflare` +
-      `wrangler.jsonc` + `open-next.config.ts` instead — same free tier,
-      same reasons for picking Cloudflare over Vercel, just the current
-      supported path). Cloudflare project connects to the GitHub repo
-      directly (Workers Builds), build command
-      `npx opennextjs-cloudflare build`, deploy command `npx wrangler
-      deploy`, all 7 `NEXT_PUBLIC_*` env vars added in the dashboard's
-      Variables and Secrets. Verified end-to-end on the real production
-      domain — real Supabase data, locality browsing, all correct.
-      **Not yet done:** sitemap.xml, robots.txt, JSON-LD structured data.
-      Every push to `main` on GitHub will now auto-redeploy — no manual
-      deploy step needed going forward.
+- [x] **Step 12 done — deploy, domain, sitemap, robots.txt, JSON-LD.**
+      **The site is live at https://homyrealty.com** — domain bought via
+      Cloudflare Registrar, code on GitHub (`akyapada/aj_fairdeal_realty`),
+      deployed to Cloudflare Workers via the OpenNext adapter
+      (`@cloudflare/next-on-pages` doesn't support Next.js 16 yet, so this
+      uses `@opennextjs/cloudflare` + `wrangler.jsonc` +
+      `open-next.config.ts` instead — same free tier, same reasons for
+      picking Cloudflare over Vercel, just the current supported path).
+      Cloudflare project connects to the GitHub repo directly (Workers
+      Builds), build command `npx opennextjs-cloudflare build`, deploy
+      command `npx wrangler deploy`, all 7 `NEXT_PUBLIC_*` env vars added
+      in the dashboard's Variables and Secrets. Every push to `main` on
+      GitHub now auto-redeploys — no manual deploy step needed going
+      forward. `app/sitemap.ts` lists the homepage, `/localities`, every
+      active locality, and every published project (auto-updates as
+      content is added). `app/robots.ts` allows everything except
+      `/admin` and points to the sitemap. JSON-LD: a site-wide
+      `RealEstateAgent` block in the root layout, and a per-project
+      `RealEstateListing` block (name, description, address/geo when
+      set, starting price) on each project page. Verified in-browser:
+      `/sitemap.xml` and `/robots.txt` render correctly, both JSON-LD
+      blocks parse as valid JSON with the right shape.
 - [x] **Staff leads dashboard** (`/admin`) — not in the original 12-step
       build order; added after the operator asked for something friendlier
       than raw Table Editor for the field team. See "Staff leads

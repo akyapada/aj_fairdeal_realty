@@ -40,6 +40,8 @@ interface Project {
   construction_status: string;
   possession_date: string | null;
   address: string | null;
+  latitude: number | null;
+  longitude: number | null;
   total_units: number | null;
   total_towers: number | null;
   total_floors: number | null;
@@ -176,8 +178,44 @@ export default async function ProjectPage({
     `Hi, I'm interested in ${project.name} in ${project.localities?.name ?? "Hyderabad"}. Can you share more details?`
   );
 
+  const listingJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "RealEstateListing",
+    name: project.name,
+    description: project.description ?? project.meta_description ?? undefined,
+    url: `https://homyrealty.com/projects/${project.slug}`,
+    ...(project.address && {
+      address: {
+        "@type": "PostalAddress",
+        streetAddress: project.address,
+        addressLocality: project.localities?.name,
+        addressRegion: "Telangana",
+        addressCountry: "IN",
+      },
+    }),
+    ...(project.latitude &&
+      project.longitude && {
+        geo: {
+          "@type": "GeoCoordinates",
+          latitude: project.latitude,
+          longitude: project.longitude,
+        },
+      }),
+    ...(startingPrice != null && {
+      offers: {
+        "@type": "Offer",
+        price: startingPrice,
+        priceCurrency: "INR",
+      },
+    }),
+  };
+
   return (
     <div className="flex-1" style={{ background: "var(--paper)" }}>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(listingJsonLd) }}
+      />
       <ViewTracker projectId={project.id} />
       <header className="border-b" style={{ borderColor: "var(--line)" }}>
         <div className="mx-auto max-w-6xl px-5 py-4">
