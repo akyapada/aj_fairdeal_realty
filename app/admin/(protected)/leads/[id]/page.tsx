@@ -2,8 +2,10 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase-server";
 import { getLocalities } from "@/lib/localities";
-import { formatINR } from "@/lib/supabase";
+import { formatINR, formatPriceRange } from "@/lib/supabase";
 import { STATUS_OPTIONS } from "@/lib/lead-status";
+import { findMatchingListings } from "@/lib/lead-matching";
+import { buildWhatsAppLink } from "@/lib/whatsapp";
 import ActivityLogForm from "@/components/admin/ActivityLogForm";
 
 const STATUS_LABELS: Record<string, string> = Object.fromEntries(
@@ -79,6 +81,22 @@ export default async function LeadDetailPage({ params }: { params: Promise<{ id:
   const latest = requirements[0];
   const views = viewsRes.data ?? [];
   const distinctDays = new Set(views.map((v) => new Date(v.created_at).toDateString())).size;
+
+  // Only worth searching once they've told us something specific — an
+  // empty requirement would just "match" everything, which isn't a match.
+  const hasSpecificRequirement =
+    !!latest &&
+    (!!latest.bedrooms_wanted?.length || !!latest.preferred_localities?.length || latest.budget_min != null || latest.budget_max != null);
+
+  const matches = hasSpecificRequirement
+    ? await findMatchingListings(supabase, {
+        bedrooms_wanted: latest.bedrooms_wanted,
+        preferred_localities: latest.preferred_localities,
+        budget_min: latest.budget_min,
+        budget_max: latest.budget_max,
+        property_types: null,
+      })
+    : [];
 
   return (
     <div className="mx-auto max-w-4xl px-5 py-8">
@@ -197,6 +215,64 @@ export default async function LeadDetailPage({ params }: { params: Promise<{ id:
           </dl>
         </div>
       </div>
+
+      {hasSpecificRequirement && (
+        <div className="mt-6">
+          <h2 className="text-sm font-semibold uppercase tracking-wide" style={{ color: "var(--ink-3)" }}>
+            Properties that might fit
+          </h2>
+          {matches.length === 0 ? (
+            <p className="mt-2 text-sm" style={{ color: "var(--ink-3)" }}>
+              Nothing active matches what they&apos;re looking for right now.
+            </p>
+          ) : (
+            <div className="mt-2 flex flex-col gap-2">
+              {matches.map((m) => {
+                const waLink = buildWhatsAppLink(
+                  `Hi${lead.full_name ? ` ${lead.full_name}` : ""}, this just came up and it matches what you're looking for: ${m.title ?? m.projectName}${m.localityName ? ` in ${m.localityName}` : ""}, ${formatPriceRange(m.price_min, m.price_max, m.is_price_on_request)}. Want the details?`
+                );
+                return (
+                  <div
+                    key={m.id}
+                    className="flex flex-wrap items-center justify-between gap-3 rounded-[var(--radius)] border p-3"
+                    style={{ background: "var(--surface)", borderColor: "var(--line)" }}
+                  >
+                    <div>
+                      <Link
+                        href={`/projects/${m.projectSlug}`}
+                        target="_blank"
+                        className="text-sm font-semibold"
+                        style={{ color: "var(--accent)" }}
+                      >
+                        {m.title ?? m.projectName}
+                      </Link>
+                      <p className="text-xs" style={{ color: "var(--ink-2)" }}>
+                        {m.projectName}
+                        {m.localityName ? ` · ${m.localityName}` : ""}
+                        {m.bedrooms ? ` · ${m.bedrooms} BHK` : ""}
+                      </p>
+                      <p className="tabular text-sm font-semibold" style={{ color: "var(--ink)" }}>
+                        {formatPriceRange(m.price_min, m.price_max, m.is_price_on_request)}
+                      </p>
+                    </div>
+                    {waLink && (
+                      <a
+                        href={waLink}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="rounded-md px-3 py-1.5 text-xs font-bold text-white"
+                        style={{ background: "#128C7E" }}
+                      >
+                        Ask on WhatsApp
+                      </a>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
+      )}
 
       <div className="mt-6">
         <h2 className="text-sm font-semibold uppercase tracking-wide" style={{ color: "var(--ink-3)" }}>

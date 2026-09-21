@@ -39,7 +39,7 @@ export const supabase = createClient(url, anonKey);
 export const PUBLIC_PROJECT_COLS = `
   id, name, slug, property_type, rera_number, is_rera_registered,
   rera_valid_until, construction_status, possession_date, address,
-  latitude, longitude, total_units, total_towers, total_floors,
+  latitude, longitude, locality_id, total_units, total_towers, total_floors,
   land_area_acres, open_space_percent, amenities, description,
   meta_title, meta_description,
   builders ( name, slug, established_year ),

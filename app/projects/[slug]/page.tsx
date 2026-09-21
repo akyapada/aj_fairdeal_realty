@@ -16,6 +16,7 @@ import { getLocalities } from "@/lib/localities";
 import EnquiryForm from "@/components/EnquiryForm";
 import ViewTracker from "@/components/ViewTracker";
 import { buildWhatsAppLink } from "@/lib/whatsapp";
+import { getLocalityPriceBenchmark, formatDeltaVsBenchmark } from "@/lib/price-benchmark";
 
 interface Locality {
   name: string;
@@ -42,6 +43,7 @@ interface Project {
   address: string | null;
   latitude: number | null;
   longitude: number | null;
+  locality_id: number | null;
   total_units: number | null;
   total_towers: number | null;
   total_floors: number | null;
@@ -161,10 +163,11 @@ export default async function ProjectPage({
   const project = await getProject(slug);
   if (!project) notFound();
 
-  const [listings, media, localities] = await Promise.all([
+  const [listings, media, localities, priceBenchmark] = await Promise.all([
     getListings(project.id),
     getMedia(project.id),
     getLocalities(),
+    project.locality_id ? getLocalityPriceBenchmark(project.locality_id) : Promise.resolve(null),
   ]);
 
   const startingPrice = listings.reduce<number | null>((min, l) => {
@@ -366,6 +369,19 @@ export default async function ProjectPage({
                           </td>
                           <td className="tabular whitespace-nowrap px-3 py-2.5 font-semibold" style={{ color: "var(--ink)" }}>
                             {formatPriceRange(l.price_min, l.price_max, l.is_price_on_request)}
+                            {priceBenchmark && l.price_per_sqft != null && (
+                              <div
+                                className="text-xs font-normal"
+                                style={{
+                                  color:
+                                    l.price_per_sqft < priceBenchmark.avgPricePerSqft
+                                      ? "var(--good)"
+                                      : "var(--warn)",
+                                }}
+                              >
+                                {formatDeltaVsBenchmark(l.price_per_sqft, priceBenchmark)}
+                              </div>
+                            )}
                           </td>
                           <td className="tabular whitespace-nowrap px-3 py-2.5" style={{ color: "var(--ink)" }}>
                             {l.kind === "new_launch"
