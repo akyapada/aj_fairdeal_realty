@@ -5,6 +5,7 @@ import { MapPin, SearchX } from "lucide-react";
 
 import ListingCard from "@/components/ListingCard";
 import SiteHeader from "@/components/SiteHeader";
+import SiteFooter from "@/components/SiteFooter";
 import { supabase, PUBLIC_LISTING_COLS, PUBLIC_PROJECT_COLS } from "@/lib/supabase";
 import type { ListingCardData } from "@/lib/types";
 
@@ -127,6 +128,7 @@ export default async function LocalityPage({
           )}
         </div>
       </main>
+      <SiteFooter />
     </div>
   );
 }

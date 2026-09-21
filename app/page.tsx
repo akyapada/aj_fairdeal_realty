@@ -2,6 +2,7 @@ import { Suspense } from "react";
 import { Home as HomeIcon, SearchX } from "lucide-react";
 
 import SiteHeader from "@/components/SiteHeader";
+import SiteFooter from "@/components/SiteFooter";
 import FilterPanel from "@/components/FilterPanel";
 import ListingCard from "@/components/ListingCard";
 import { supabase, PUBLIC_LISTING_COLS, PUBLIC_PROJECT_COLS } from "@/lib/supabase";
@@ -109,6 +110,7 @@ export default async function Home({
           )}
         </div>
       </main>
+      <SiteFooter />
     </div>
   );
 }

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { supabase, getSessionId } from "@/lib/supabase";
 import { BHK_OPTIONS, BUDGET_BUCKETS } from "@/lib/filters";
 import type { Locality } from "@/lib/localities";
@@ -305,7 +306,13 @@ export default function EnquiryForm({
           className="mt-0.5 h-4 w-4 flex-none"
           style={{ accentColor: "var(--accent)" }}
         />
-        <span>{CONSENT_TEXT}</span>
+        <span>
+          {CONSENT_TEXT}{" "}
+          <Link href="/privacy" target="_blank" className="underline" style={{ color: "var(--accent)" }}>
+            See our privacy policy
+          </Link>
+          .
+        </span>
       </label>
 
       {status === "error" && (

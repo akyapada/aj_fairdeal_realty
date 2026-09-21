@@ -16,6 +16,7 @@ import { getLocalities } from "@/lib/localities";
 import EnquiryForm from "@/components/EnquiryForm";
 import ViewTracker from "@/components/ViewTracker";
 import SiteHeader from "@/components/SiteHeader";
+import SiteFooter from "@/components/SiteFooter";
 import { buildWhatsAppLink } from "@/lib/whatsapp";
 import { getLocalityPriceBenchmark, formatDeltaVsBenchmark } from "@/lib/price-benchmark";
 import { buildMapEmbedUrl } from "@/lib/maps";
@@ -497,6 +498,7 @@ export default async function ProjectPage({
           </div>
         </aside>
       </main>
+      <SiteFooter />
     </div>
   );
 }

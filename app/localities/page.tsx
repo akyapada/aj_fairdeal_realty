@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { MapPin } from "lucide-react";
 import SiteHeader from "@/components/SiteHeader";
+import SiteFooter from "@/components/SiteFooter";
 import { getLocalities } from "@/lib/localities";
 
 export const metadata: Metadata = {
@@ -55,6 +56,7 @@ export default async function LocalitiesIndexPage() {
           ))}
         </div>
       </main>
+      <SiteFooter />
     </div>
   );
 }
