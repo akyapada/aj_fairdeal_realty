@@ -418,11 +418,20 @@ and talking to buyers, not polish.
       and to Maps Embed API only. Renders a "Location" section on each
       project page — falls back lat/long → address → project name +
       locality, whichever is set, and renders nothing if the env var is
-      blank. Verified in-browser: real map loads for Aranya Skyline. **The
-      key still needs adding to Cloudflare's env vars** (Settings →
-      Variables and Secrets → `NEXT_PUBLIC_GOOGLE_MAPS_EMBED_KEY`) — it's
-      only in local `.env.local` so far, so the live site won't show the
-      map until that's done.
+      blank. Verified in-browser: real map loads for Aranya Skyline. Key
+      added to Cloudflare's env vars too and redeployed — live on
+      homyrealty.com.
+- [x] **Brand rename + About Us page.** The site displayed "AJ FairDeal
+      Realty" everywhere while the domain is homyrealty.com — confirmed
+      as genuinely confusing (even the operator mistyped the domain),
+      not just cosmetic. Renamed to **Homy Realty** consistently: header,
+      footer, admin login/header, page title template, JSON-LD
+      organization name, and the DPDP consent text (only affects new
+      consent going forward — historical `leads.consent_text` rows
+      correctly keep the exact wording actually agreed to at the time,
+      which is correct, not something to "fix"). Added `app/about/page.tsx`
+      — honest, values-based copy (no fabricated bio/credentials, since
+      none were given), linked from a new footer nav row.
 
 ### Not yet done — from the differentiation discussion
 
