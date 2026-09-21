@@ -14,6 +14,7 @@ import {
 } from "@/lib/supabase";
 import { getLocalities } from "@/lib/localities";
 import EnquiryForm from "@/components/EnquiryForm";
+import ViewTracker from "@/components/ViewTracker";
 
 interface Locality {
   name: string;
@@ -172,6 +173,7 @@ export default async function ProjectPage({
 
   return (
     <div className="flex-1" style={{ background: "var(--paper)" }}>
+      <ViewTracker projectId={project.id} />
       <header className="border-b" style={{ borderColor: "var(--line)" }}>
         <div className="mx-auto max-w-6xl px-5 py-4">
           <Link href="/" className="text-sm font-medium" style={{ color: "var(--accent)" }}>

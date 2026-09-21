@@ -247,7 +247,22 @@ and talking to buyers, not polish.
       function submit_enquiry(...)`) — verified end-to-end with a real
       submission in the browser (got the "we've got your details" success
       state, no RPC error).
-- [ ] View tracking → `record_listing_view()` (step 8)
+- [x] View tracking → `record_listing_view()` (step 8).
+      `components/ViewTracker.tsx` on the project page records a
+      `listing_views` row (session id, `project_id`, seconds on page) on
+      tab-hide, real unload, and client-side route change away — App
+      Router swaps content without unloading the document, so unload
+      events alone would miss almost every real navigation.
+      Caught and fixed a real bug while verifying this: `supabase.rpc(...)`
+      returns a lazy thenable that only actually sends the request once you
+      call `.then()`/`await` it — the first version used `void supabase.rpc(...)`,
+      which built the request but never fired it. Fixed by chaining
+      `.then()`. Verified the fix by calling the RPC directly via `fetch`
+      (204 success) and, separately, by checking `performance.getEntriesByType`
+      in the live page after a real navigation — confirmed the request goes
+      out (the browser tool's network-request log doesn't appear to capture
+      cross-origin `fetch` calls at all, so don't rely on it for verifying
+      Supabase calls in future sessions).
 
 ### Notes for next session
 
