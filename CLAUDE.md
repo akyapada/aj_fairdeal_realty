@@ -289,9 +289,32 @@ and talking to buyers, not polish.
       `collect` endpoint all fired. Accounts, in case they're needed again:
       PostHog project key `phc_rnQu...` (US Cloud), Clarity project
       `ylpkmbczhy`, GA4 property `G-KBZ0JBG3RL`.
+- [x] Locality landing pages (step 11) — the SEO engine.
+      `app/localities/[slug]/page.tsx` shows the locality name/zone, its
+      `description` (your own SEO copy — currently null for all 54 seeded
+      localities, so the intro paragraph just doesn't render until you
+      write one; the listing grid below it works regardless), and every
+      active sale listing (apartments/villas) in that locality, each with
+      its own unique `<title>`/meta description. Added `app/localities/page.tsx`,
+      an index grouped by zone, linking to every locality page — without it
+      the locality pages would have no internal links pointing to them,
+      which defeats the point before step 12's sitemap even exists. Added a
+      "Browse by locality" link on the homepage header so the index itself
+      is reachable. Extracted the listing-card JSX (duplicated between the
+      homepage and this) into `components/ListingCard.tsx` and shared
+      query-result types into `lib/types.ts`. Verified in-browser: index
+      page groups correctly by zone, Gachibowli shows the one real listing
+      with the right SEO title, Kokapet (no listings) shows the empty
+      state, and an invalid slug 404s properly.
 
 ### Notes for next session
 
+- All 54 seeded localities still have `description = null` — the locality
+  pages work fine without it, but that column is the actual SEO
+  content (one honest paragraph per area, per `seed-localities.sql`'s own
+  comment) that these pages exist to rank on. Writing those is real content
+  work, not a coding task, and it's the highest-leverage thing left before
+  step 11 does anything for organic traffic.
 - Analytics load unconditionally right now — no cookie/tracking consent
   banner gates PostHog, Clarity or GA4. DPDP's consent requirement is
   currently wired only for lead capture (`leads.consent_given`); whether
