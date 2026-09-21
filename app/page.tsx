@@ -9,13 +9,7 @@ import {
   formatPriceRange,
 } from "@/lib/supabase";
 import { hasActiveFilters, parseFilters, type SearchParamsInput } from "@/lib/filters";
-
-interface Locality {
-  id: number;
-  name: string;
-  slug: string;
-  zone: string | null;
-}
+import { getLocalities, type Locality } from "@/lib/localities";
 
 interface Project {
   id: string;
@@ -37,18 +31,6 @@ interface Listing {
   price_max: number | null;
   is_price_on_request: boolean;
   projects: Project;
-}
-
-async function getLocalities(): Promise<Locality[]> {
-  const { data, error } = await supabase
-    .from("localities")
-    .select("id, name, slug, zone")
-    .order("name");
-  if (error) {
-    console.error("Failed to load localities:", error.message);
-    return [];
-  }
-  return data ?? [];
 }
 
 // v1 scope (see CLAUDE.md): new-launch and resale apartments and villas, for sale only.

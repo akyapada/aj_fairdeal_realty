@@ -539,7 +539,8 @@ create or replace function submit_enquiry(
   p_bedrooms    int[] default null,
   p_localities  int[] default null,
   p_purpose     buyer_purpose default null,
-  p_notes       text default null
+  p_notes       text default null,
+  p_workplace_locality_id int default null
 ) returns uuid as $$
 declare
   v_lead_id uuid;
@@ -559,10 +560,10 @@ begin
   returning id into v_lead_id;
 
   insert into lead_requirements
-    (lead_id, budget_min, budget_max, bedrooms_wanted, preferred_localities, purpose, notes)
+    (lead_id, budget_min, budget_max, bedrooms_wanted, preferred_localities, purpose, notes, workplace_locality_id)
   values
     (v_lead_id, p_budget_min, p_budget_max,
-     coalesce(p_bedrooms,'{}'), coalesce(p_localities,'{}'), p_purpose, p_notes);
+     coalesce(p_bedrooms,'{}'), coalesce(p_localities,'{}'), p_purpose, p_notes, p_workplace_locality_id);
 
   if p_listing_id is not null then
     insert into lead_listing_interest (lead_id, listing_id, type)

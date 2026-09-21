@@ -12,6 +12,8 @@ import {
   formatFullDate,
   formatFacing,
 } from "@/lib/supabase";
+import { getLocalities } from "@/lib/localities";
+import EnquiryForm from "@/components/EnquiryForm";
 
 interface Locality {
   name: string;
@@ -155,9 +157,10 @@ export default async function ProjectPage({
   const project = await getProject(slug);
   if (!project) notFound();
 
-  const [listings, media] = await Promise.all([
+  const [listings, media, localities] = await Promise.all([
     getListings(project.id),
     getMedia(project.id),
+    getLocalities(),
   ]);
 
   const startingPrice = listings.reduce<number | null>((min, l) => {
@@ -358,18 +361,33 @@ export default async function ProjectPage({
           )}
         </div>
 
-        <aside
-          className="rounded-[var(--radius)] border p-4"
-          style={{ borderColor: "var(--line)", background: "var(--surface)", boxShadow: "var(--shadow)" }}
-        >
-          <span className="text-xs font-semibold uppercase tracking-wide" style={{ color: "var(--ink-3)" }}>
-            Starting from
-          </span>
+        <aside className="flex flex-col gap-4 lg:sticky lg:top-4">
           <div
-            className="tabular mt-1 text-2xl font-extrabold"
-            style={{ color: "var(--ink)", fontFamily: "var(--font-bricolage)" }}
+            className="rounded-[var(--radius)] border p-4"
+            style={{ borderColor: "var(--line)", background: "var(--surface)", boxShadow: "var(--shadow)" }}
           >
-            {startingPrice != null ? formatINR(startingPrice) : "Price on request"}
+            <span className="text-xs font-semibold uppercase tracking-wide" style={{ color: "var(--ink-3)" }}>
+              Starting from
+            </span>
+            <div
+              className="tabular mt-1 text-2xl font-extrabold"
+              style={{ color: "var(--ink)", fontFamily: "var(--font-bricolage)" }}
+            >
+              {startingPrice != null ? formatINR(startingPrice) : "Price on request"}
+            </div>
+          </div>
+
+          <div
+            className="rounded-[var(--radius)] border p-4"
+            style={{ borderColor: "var(--line)", background: "var(--surface)", boxShadow: "var(--shadow)" }}
+          >
+            <EnquiryForm
+              listings={listings.map((l) => ({
+                id: l.id,
+                label: l.title ?? (l.bedrooms ? `${l.bedrooms} BHK` : "Configuration"),
+              }))}
+              localities={localities}
+            />
           </div>
         </aside>
       </main>

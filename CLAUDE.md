@@ -234,7 +234,19 @@ and talking to buyers, not polish.
       public page, and that's the rule that wins. Listing cards on the
       homepage now link to their project page. Verified in-browser against
       the live test row, including the null-field fallbacks.
-- [ ] Requirement capture form → `submit_enquiry()` (step 7)
+- [x] Requirement capture form → `submit_enquiry()` (step 7).
+      `components/EnquiryForm.tsx` on the project page sidebar captures
+      name, phone (required), email, which configuration, bedrooms wanted,
+      budget bucket, other localities considered, workplace locality,
+      purpose, notes, and DPDP consent (exact wording stored via
+      `consent_text`). Extended `submit_enquiry()` in `schema.sql` to accept
+      `p_workplace_locality_id` — the function didn't expose it even though
+      `lead_requirements.workplace_locality_id` already existed and
+      CLAUDE.md calls it out as always-ask. **You ran the updated function
+      in the Supabase SQL editor this session** (`create or replace
+      function submit_enquiry(...)`) — verified end-to-end with a real
+      submission in the browser (got the "we've got your details" success
+      state, no RPC error).
 - [ ] View tracking → `record_listing_view()` (step 8)
 
 ### Notes for next session
@@ -252,6 +264,14 @@ and talking to buyers, not polish.
   a pass once more data exists.
 - Git repo initialized this session (`git init` + first commit). Continue
   committing at meaningful checkpoints.
+- The enquiry form links to no privacy policy page yet (none exists). The
+  consent checkbox text stands on its own for now — Compliance requires a
+  privacy policy page before launch regardless; add it and link it from the
+  form before going live.
+- A real test enquiry was submitted through the form this session (name
+  "Test Buyer", phone 9999999999) — there's a live row in `leads` /
+  `lead_requirements` now. Fine to delete from the Supabase table editor
+  once you're done testing.
 - Run the app locally with `npm run dev`.
 
 _Update this section at the end of every session._
