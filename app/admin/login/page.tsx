@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { Building2 } from "lucide-react";
 import { createClient } from "@/lib/supabase-browser";
 
 export default function AdminLoginPage() {
@@ -36,11 +37,17 @@ export default function AdminLoginPage() {
         className="flex w-full max-w-sm flex-col gap-4 rounded-[var(--radius)] border p-6"
         style={{ background: "var(--surface)", borderColor: "var(--line)", boxShadow: "var(--shadow)" }}
       >
-        <div>
+        <div className="flex flex-col items-center gap-2 text-center">
+          <span
+            className="flex h-10 w-10 items-center justify-center rounded-lg"
+            style={{ background: "var(--accent)" }}
+          >
+            <Building2 size={22} color="var(--accent-ink)" strokeWidth={2.25} />
+          </span>
           <h1 className="text-lg font-extrabold" style={{ color: "var(--ink)" }}>
             AJ FairDeal Realty
           </h1>
-          <p className="mt-1 text-sm" style={{ color: "var(--ink-2)" }}>
+          <p className="text-sm" style={{ color: "var(--ink-2)" }}>
             Staff sign-in
           </p>
         </div>

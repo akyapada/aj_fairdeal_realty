@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { MapPin } from "lucide-react";
+import SiteHeader from "@/components/SiteHeader";
 import { getLocalities } from "@/lib/localities";
 
 export const metadata: Metadata = {
@@ -20,16 +22,11 @@ export default async function LocalitiesIndexPage() {
 
   return (
     <div className="flex-1" style={{ background: "var(--paper)" }}>
-      <header className="border-b" style={{ borderColor: "var(--line)" }}>
-        <div className="mx-auto max-w-6xl px-5 py-4">
-          <Link href="/" className="text-sm font-medium" style={{ color: "var(--accent)" }}>
-            ← All properties
-          </Link>
-        </div>
-      </header>
+      <SiteHeader backHref="/" backLabel="All properties" />
 
       <main className="mx-auto max-w-6xl px-5 py-8">
-        <h1 className="text-2xl font-extrabold" style={{ color: "var(--ink)" }}>
+        <h1 className="flex items-center gap-2 text-2xl font-extrabold" style={{ color: "var(--ink)" }}>
+          <MapPin size={22} color="var(--accent)" />
           Browse Hyderabad by locality
         </h1>
         <p className="mt-1 text-sm" style={{ color: "var(--ink-2)" }}>

@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { notFound } from "next/navigation";
+import { BadgeCheck, MapPin, MessageCircle } from "lucide-react";
 
 import {
   supabase,
@@ -15,6 +15,7 @@ import {
 import { getLocalities } from "@/lib/localities";
 import EnquiryForm from "@/components/EnquiryForm";
 import ViewTracker from "@/components/ViewTracker";
+import SiteHeader from "@/components/SiteHeader";
 import { buildWhatsAppLink } from "@/lib/whatsapp";
 import { getLocalityPriceBenchmark, formatDeltaVsBenchmark } from "@/lib/price-benchmark";
 
@@ -220,18 +221,13 @@ export default async function ProjectPage({
         dangerouslySetInnerHTML={{ __html: JSON.stringify(listingJsonLd) }}
       />
       <ViewTracker projectId={project.id} />
-      <header className="border-b" style={{ borderColor: "var(--line)" }}>
-        <div className="mx-auto max-w-6xl px-5 py-4">
-          <Link href="/" className="text-sm font-medium" style={{ color: "var(--accent)" }}>
-            ← All properties
-          </Link>
-        </div>
-      </header>
+      <SiteHeader backHref="/" backLabel="All properties" />
 
       <main className="mx-auto grid max-w-6xl grid-cols-1 gap-6 px-5 py-8 lg:grid-cols-[1fr_310px] lg:items-start">
         <div className="flex flex-col gap-6">
           <div>
-            <span className="text-sm font-medium" style={{ color: "var(--ink-2)" }}>
+            <span className="inline-flex items-center gap-1 text-sm font-medium" style={{ color: "var(--ink-2)" }}>
+              <MapPin size={14} />
               {project.localities?.name ?? "Hyderabad"}
               {project.localities?.zone ? `, ${project.localities.zone} Hyderabad` : ""}
             </span>
@@ -279,9 +275,10 @@ export default async function ProjectPage({
             {project.is_rera_registered && project.rera_number ? (
               <>
                 <span
-                  className="font-mono-plex text-base font-semibold"
+                  className="font-mono-plex inline-flex items-center gap-1 text-base font-semibold"
                   style={{ color: "var(--warn)" }}
                 >
+                  <BadgeCheck size={16} />
                   {project.rera_number}
                 </span>
                 <span className="text-sm" style={{ color: "var(--ink-2)" }}>
@@ -444,6 +441,7 @@ export default async function ProjectPage({
                 className="mt-3 flex w-full items-center justify-center gap-2 rounded-md py-2.5 text-sm font-bold text-white"
                 style={{ background: "#128C7E" }}
               >
+                <MessageCircle size={16} />
                 Ask on WhatsApp
               </a>
             )}

@@ -1,4 +1,5 @@
 import { redirect } from "next/navigation";
+import { Building2 } from "lucide-react";
 import { createClient } from "@/lib/supabase-server";
 import SignOutButton from "@/components/admin/SignOutButton";
 
@@ -22,11 +23,17 @@ export default async function ProtectedAdminLayout({ children }: { children: Rea
     <div className="flex min-h-screen flex-col" style={{ background: "var(--paper)" }}>
       <header className="border-b" style={{ borderColor: "var(--line)" }}>
         <div className="mx-auto flex max-w-6xl items-center justify-between px-5 py-4">
-          <div>
+          <div className="flex items-center gap-2">
+            <span
+              className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md"
+              style={{ background: "var(--accent)" }}
+            >
+              <Building2 size={16} color="var(--accent-ink)" strokeWidth={2.25} />
+            </span>
             <span className="text-sm font-extrabold" style={{ color: "var(--ink)" }}>
               AJ FairDeal Realty
             </span>
-            <span className="ml-2 text-sm" style={{ color: "var(--ink-2)" }}>
+            <span className="text-sm" style={{ color: "var(--ink-2)" }}>
               Admin
             </span>
           </div>

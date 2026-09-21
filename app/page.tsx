@@ -1,6 +1,7 @@
 import { Suspense } from "react";
-import Link from "next/link";
+import { Home as HomeIcon, SearchX } from "lucide-react";
 
+import SiteHeader from "@/components/SiteHeader";
 import FilterPanel from "@/components/FilterPanel";
 import ListingCard from "@/components/ListingCard";
 import { supabase, PUBLIC_LISTING_COLS, PUBLIC_PROJECT_COLS } from "@/lib/supabase";
@@ -55,25 +56,27 @@ export default async function Home({
 
   return (
     <div className="flex-1" style={{ background: "var(--paper)" }}>
-      <header className="border-b" style={{ borderColor: "var(--line)" }}>
-        <div className="mx-auto flex max-w-6xl items-start justify-between gap-4 px-5 py-6">
-          <div>
-            <h1 className="text-2xl font-extrabold" style={{ color: "var(--ink)" }}>
-              AJ FairDeal Realty
-            </h1>
-            <p className="mt-1 text-sm" style={{ color: "var(--ink-2)" }}>
-              New-launch and resale apartments &amp; villas across Hyderabad — honest details, no noise.
-            </p>
-          </div>
-          <Link
-            href="/localities"
-            className="mt-1 shrink-0 text-sm font-medium"
-            style={{ color: "var(--accent)" }}
+      <SiteHeader />
+
+      <div style={{ background: "var(--accent-soft)", borderBottom: "1px solid var(--line)" }}>
+        <div className="mx-auto flex max-w-6xl items-center gap-3 px-5 py-5">
+          <span
+            className="hidden h-10 w-10 shrink-0 items-center justify-center rounded-full sm:flex"
+            style={{ background: "var(--accent)" }}
           >
-            Browse by locality
-          </Link>
+            <HomeIcon size={20} color="var(--accent-ink)" />
+          </span>
+          <h1
+            className="text-xl font-extrabold sm:text-2xl"
+            style={{ color: "var(--ink)", fontFamily: "var(--font-bricolage)" }}
+          >
+            New-launch and resale apartments &amp; villas across Hyderabad
+            <span className="block font-normal" style={{ color: "var(--ink-2)", fontFamily: "var(--font-ibm-plex-sans)" }}>
+              Honest details, no noise.
+            </span>
+          </h1>
         </div>
-      </header>
+      </div>
 
       <main className="mx-auto grid max-w-6xl grid-cols-1 gap-6 px-5 py-8 md:grid-cols-[240px_1fr]">
         <Suspense fallback={null}>
@@ -89,9 +92,10 @@ export default async function Home({
 
           {listings.length === 0 ? (
             <div
-              className="rounded-[var(--radius)] border border-dashed p-10 text-center"
+              className="flex flex-col items-center gap-2 rounded-[var(--radius)] border border-dashed p-10 text-center"
               style={{ borderColor: "var(--line-2)", color: "var(--ink-3)" }}
             >
+              <SearchX size={28} />
               {filtersActive
                 ? "No properties match these filters. Try widening the budget or clearing a locality."
                 : "No active listings yet. Publish a project and mark a listing active in the Supabase table editor to see it here."}

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { ChevronDown, SlidersHorizontal } from "lucide-react";
 import {
   BHK_OPTIONS,
   BUDGET_BUCKETS,
@@ -82,10 +83,10 @@ function FilterSection({
           )}
         </span>
         <span
-          className="text-sm transition-transform"
+          className="transition-transform"
           style={{ color: "var(--ink-3)", transform: open ? "rotate(180deg)" : "rotate(0deg)" }}
         >
-          ▾
+          <ChevronDown size={16} />
         </span>
       </button>
       {open && <div className="mt-2.5 flex flex-col gap-2.5">{children}</div>}
@@ -236,7 +237,8 @@ export default function FilterPanel({ localities }: { localities: Locality[] }) 
       style={{ background: "var(--surface)", borderColor: "var(--line)" }}
     >
       <div className="mb-1 flex items-center justify-between">
-        <span className="text-sm font-bold" style={{ color: "var(--ink)" }}>
+        <span className="inline-flex items-center gap-1.5 text-sm font-bold" style={{ color: "var(--ink)" }}>
+          <SlidersHorizontal size={15} color="var(--accent)" />
           Filters
         </span>
         {hasActiveFilters && (

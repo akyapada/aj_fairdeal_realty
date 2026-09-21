@@ -1,8 +1,10 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { MapPin, SearchX } from "lucide-react";
 
 import ListingCard from "@/components/ListingCard";
+import SiteHeader from "@/components/SiteHeader";
 import { supabase, PUBLIC_LISTING_COLS, PUBLIC_PROJECT_COLS } from "@/lib/supabase";
 import type { ListingCardData } from "@/lib/types";
 
@@ -82,16 +84,11 @@ export default async function LocalityPage({
 
   return (
     <div className="flex-1" style={{ background: "var(--paper)" }}>
-      <header className="border-b" style={{ borderColor: "var(--line)" }}>
-        <div className="mx-auto max-w-6xl px-5 py-4">
-          <Link href="/localities" className="text-sm font-medium" style={{ color: "var(--accent)" }}>
-            ← All localities
-          </Link>
-        </div>
-      </header>
+      <SiteHeader backHref="/localities" backLabel="All localities" />
 
       <main className="mx-auto max-w-6xl px-5 py-8">
-        <span className="text-sm font-medium" style={{ color: "var(--ink-2)" }}>
+        <span className="inline-flex items-center gap-1 text-sm font-medium" style={{ color: "var(--ink-2)" }}>
+          <MapPin size={14} />
           {locality.zone ? `${locality.zone} Hyderabad` : "Hyderabad"}
         </span>
         <h1 className="mt-1 text-3xl font-extrabold" style={{ color: "var(--ink)" }}>
@@ -111,9 +108,10 @@ export default async function LocalityPage({
 
           {listings.length === 0 ? (
             <div
-              className="mt-4 rounded-[var(--radius)] border border-dashed p-10 text-center"
+              className="mt-4 flex flex-col items-center gap-2 rounded-[var(--radius)] border border-dashed p-10 text-center"
               style={{ borderColor: "var(--line-2)", color: "var(--ink-3)" }}
             >
+              <SearchX size={28} />
               No active listings in {locality.name} right now.{" "}
               <Link href="/" style={{ color: "var(--accent)" }}>
                 Browse everything
