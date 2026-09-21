@@ -214,10 +214,15 @@ and talking to buyers, not polish.
       (lakhs/crore formatting), BHK, area and RERA number, styled with the
       ported design tokens (`app/globals.css`) and Google fonts via
       `next/font`. Verified against live Supabase data in the browser.
+- [x] Project listing page with filters — locality, bedrooms, budget,
+      property type, construction status, sale type (step 5). Filters live
+      in the URL (`?loc=&bhk=&budget=&type=&status=&kind=`) via
+      `components/FilterPanel.tsx` (client) and are parsed/applied
+      server-side in `app/page.tsx` + `lib/filters.ts`. Verified in-browser:
+      multi-select chips OR together correctly, empty state shows a
+      filtered-specific message, "Clear all filters" resets the URL.
 - [ ] Individual project page — RERA number, photos, pros/cons, config table
       (step 6)
-- [ ] Project listing page with filters — locality, budget, BHK, status
-      (step 5)
 - [ ] Requirement capture form → `submit_enquiry()` (step 7)
 - [ ] View tracking → `record_listing_view()` (step 8)
 
@@ -230,9 +235,12 @@ and talking to buyers, not polish.
 - Only `localities` was seeded from `seed-localities.sql`. One test project
   ("Aranya Skyline", Gachibowli) and one test listing were inserted by hand
   via the Supabase SQL editor to verify rendering — real project/listing data
-  still needs to be entered before this is useful content.
-- This project folder is not yet a git repository. Consider running
-  `git init` once the skeleton feels stable, so changes are tracked.
+  still needs to be entered before this is useful content. With only one
+  listing in the database, the filter UI has not been exercised against a
+  realistic result set (multiple projects/localities/price points) — worth
+  a pass once more data exists.
+- Git repo initialized this session (`git init` + first commit). Continue
+  committing at meaningful checkpoints.
 - Run the app locally with `npm run dev`.
 
 _Update this section at the end of every session._
