@@ -380,50 +380,86 @@ and talking to buyers, not polish.
       combined activity+status form (fixed from an earlier auto-save
       dropdown that committed on every click — a real bug caught during
       testing) saves correctly on explicit submit.
+- [x] **Fair Price Check** — `lib/price-benchmark.ts`. Computes a
+      locality-wide average ₹/sqft from your own active listings and shows
+      each unit's delta against it on the project page's config table
+      ("12% below area average"). Only renders once a locality has 3+
+      comparable listings — with fewer, the number would just be comparing
+      a listing to itself, which is meaningless, so it silently doesn't
+      show instead of lying. `PUBLIC_PROJECT_COLS` gained `locality_id` to
+      support this. No portal shows this number clearly; it's free to
+      compute since it's just your own data.
+- [x] **Requirement matching** — `lib/lead-matching.ts`, surfaced as
+      "Properties that might fit" on `app/admin/(protected)/leads/[id]/page.tsx`.
+      Queries active listings against a lead's *latest* requirement
+      (locality, bedrooms, budget) and shows matches with a pre-filled
+      WhatsApp link. Finding a match is automatic; sending stays a
+      deliberate one-click human action — no automated bulk messaging,
+      consistent with WhatsApp Business API being explicitly out. Verified
+      with a real enquiry (3 BHK, Gachibowli) that correctly matched the
+      one active listing.
+- Both of the above shipped via this project's first-ever pull request
+  (opened, then merged, at the operator's request) — decided afterward
+  that PRs are unnecessary ceremony for a solo project and we're back to
+  pushing straight to `main`, which auto-deploys via Cloudflare as before.
+
+### Not yet done — from the differentiation discussion
+
+Two more ideas came up when discussing how to differ from MagicBricks/
+99acres/Zillow, not yet built:
+- **Days-on-market transparency** ("Listed 23 days ago") — trivial once
+  wanted, `listings.created_at` already exists.
+- **Neighbourhood landmarks on a map** — schools/hospitals/malls noted in
+  your own words (honest, free) plus a `Maps Embed API` iframe (the only
+  Maps SKU this project is allowed to use — see Stack). **Blocked on a
+  Google Cloud API key** (Maps Embed API enabled, restricted to
+  `homyrealty.com/*` and `localhost:3000/*`) that was requested but never
+  provided. Explicitly ruled out: Places API / traffic layer / crime data
+  — billable SKUs or no honest free data source, see the conversation
+  where this was scoped for the reasoning.
 
 ### Notes for next session
 
-- Next up: finish step 12 — connect the GitHub repo to a Cloudflare
-  Workers project (dashboard → Workers & Pages → Create → Import a
-  repository), set the deploy command to `npm run deploy`, add the env
-  vars listed earlier in this file's history to the project's Settings →
-  Variables and Secrets, deploy, then attach `homyrealty.com`. After that:
-  sitemap.xml, robots.txt, JSON-LD structured data.
-- One real staff admin account exists (created this session, linked to a
-  `profiles` row with `role = 'admin'`) — that's how `/admin` was tested.
+- **Visual polish is still pending** — the operator asked for icons, a
+  proper site header, and more use of the theme's accent color ("site is
+  looking so blank"); we got pulled into the differentiation discussion
+  and two features instead. Still worth doing: no icon library installed
+  yet (lucide-react was the plan — small, tree-shakeable, standard
+  pairing with Tailwind), and there are 5 separate hand-rolled `<header>`
+  blocks across the public pages (`app/page.tsx`, `app/projects/[slug]`,
+  `app/localities`, `app/localities/[slug]`) worth unifying into one
+  shared component while doing this.
+- A second staff account may exist by now — the operator was walked
+  through adding one (Supabase Dashboard → Add user → insert into
+  `profiles`), but whether it was actually created wasn't confirmed
+  back in this file.
 - All 54 seeded localities still have `description = null` — the locality
   pages work fine without it, but that column is the actual SEO
   content (one honest paragraph per area, per `seed-localities.sql`'s own
-  comment) that these pages exist to rank on. Writing those is real content
-  work, not a coding task, and it's the highest-leverage thing left before
-  step 11 does anything for organic traffic.
+  comment) that those pages exist to rank on. Writing those is real
+  content work, not a coding task, and remains the highest-leverage thing
+  left for organic traffic.
 - Analytics load unconditionally right now — no cookie/tracking consent
   banner gates PostHog, Clarity or GA4. DPDP's consent requirement is
   currently wired only for lead capture (`leads.consent_given`); whether
   analytics trackers also need their own consent gate before launch is
   worth a real legal read, not a guess — flagging it rather than deciding
   it here.
-- `.env.local` is filled in with the real Supabase URL/anon key and
-  WhatsApp number. RERA agent number env var is still blank — fill in
-  `NEXT_PUBLIC_RERA_AGENT_NUMBER` in `.env.local` once known (never commit
-  this file — it's gitignored).
-- Only `localities` was seeded from `seed-localities.sql`. One test project
-  ("Aranya Skyline", Gachibowli) and one test listing were inserted by hand
-  via the Supabase SQL editor to verify rendering — real project/listing data
-  still needs to be entered before this is useful content. With only one
-  listing in the database, the filter UI has not been exercised against a
-  realistic result set (multiple projects/localities/price points) — worth
-  a pass once more data exists.
-- Git repo initialized this session (`git init` + first commit). Continue
-  committing at meaningful checkpoints.
-- The enquiry form links to no privacy policy page yet (none exists). The
-  consent checkbox text stands on its own for now — Compliance requires a
-  privacy policy page before launch regardless; add it and link it from the
-  form before going live.
-- A real test enquiry was submitted through the form this session (name
-  "Test Buyer", phone 9999999999) — there's a live row in `leads` /
-  `lead_requirements` now. Fine to delete from the Supabase table editor
-  once you're done testing.
+- `.env.local` has the real Supabase URL/anon key, WhatsApp number, and
+  all three analytics keys. RERA agent number env var is still blank —
+  fill in `NEXT_PUBLIC_RERA_AGENT_NUMBER` once known (never commit this
+  file — it's gitignored). If the Maps Embed API key above gets added,
+  it'll need a `NEXT_PUBLIC_GOOGLE_MAPS_EMBED_KEY`-style entry too.
+- Still only one real project ("Aranya Skyline", Gachibowli) with one
+  listing — everything else in the DB is the seeded localities. Two test
+  leads exist from verifying the enquiry form / matching this session
+  ("Test Buyer", phone 9999999999; "Match Test", phone 9888877766) — fine
+  to delete from Table Editor once done testing. Fair Price Check won't
+  show anything meaningful, and the filter UI hasn't been exercised
+  against a realistic result set, until more real listings exist.
+- The enquiry form links to no privacy policy page yet (none exists).
+  Compliance requires one before launch regardless — add it and link it
+  from the consent checkbox before going live.
 - Run the app locally with `npm run dev`.
 
 _Update this section at the end of every session._
