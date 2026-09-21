@@ -221,8 +221,19 @@ and talking to buyers, not polish.
       server-side in `app/page.tsx` + `lib/filters.ts`. Verified in-browser:
       multi-select chips OR together correctly, empty state shows a
       filtered-specific message, "Clear all filters" resets the URL.
-- [ ] Individual project page — RERA number, photos, pros/cons, config table
-      (step 6)
+- [x] Individual project page (step 6) — `app/projects/[slug]/page.tsx`.
+      Shows locality/builder byline, hero photo (falls back to the same
+      gradient placeholder as listing cards when no `media` row exists),
+      a prominent TG-RERA bar (number + validity, or a "registration
+      pending" warning), a spec grid (status/possession/towers/units/land
+      area/open space), the config table (one row per active listing:
+      area, facing, price, units available or floor), and amenities chips.
+      Deliberately does **not** show `internal_pros`/`internal_cons` or
+      owner fields — the build-order label says "pros/cons" but the
+      Security section is explicit that those columns must never reach a
+      public page, and that's the rule that wins. Listing cards on the
+      homepage now link to their project page. Verified in-browser against
+      the live test row, including the null-field fallbacks.
 - [ ] Requirement capture form → `submit_enquiry()` (step 7)
 - [ ] View tracking → `record_listing_view()` (step 8)
 

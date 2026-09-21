@@ -1,4 +1,5 @@
 import { Suspense } from "react";
+import Link from "next/link";
 
 import FilterPanel from "@/components/FilterPanel";
 import {
@@ -135,9 +136,10 @@ export default async function Home({
                 const project = listing.projects;
                 const area = listing.saleable_area_sqft ?? listing.builtup_area_sqft;
                 return (
-                  <article
+                  <Link
+                    href={`/projects/${project.slug}`}
                     key={listing.id}
-                    className="flex flex-col overflow-hidden rounded-[var(--radius)] border"
+                    className="flex flex-col overflow-hidden rounded-[var(--radius)] border transition-shadow hover:shadow-md"
                     style={{
                       background: "var(--surface)",
                       borderColor: "var(--line)",
@@ -180,7 +182,7 @@ export default async function Home({
                         )}
                       </div>
                     </div>
-                  </article>
+                  </Link>
                 );
               })}
             </div>

@@ -81,6 +81,28 @@ export function formatPriceRange(
 }
 
 // ---------------------------------------------------------------------
+// Date & facing formatting — used on project pages.
+// ---------------------------------------------------------------------
+
+export function formatMonthYear(date: string | null): string {
+  if (!date) return 'TBA';
+  return new Date(date).toLocaleDateString('en-IN', { month: 'short', year: 'numeric' });
+}
+
+export function formatFullDate(date: string | null): string {
+  if (!date) return '—';
+  return new Date(date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
+}
+
+export function formatFacing(facing: string | null): string {
+  if (!facing) return '—';
+  return facing
+    .split('_')
+    .map((w) => w[0].toUpperCase() + w.slice(1))
+    .join('-');
+}
+
+// ---------------------------------------------------------------------
 // Anonymous session id — the thread that ties a stranger's browsing
 // to the lead they eventually become. Stored in localStorage so it
 // survives across visits on the same device.
