@@ -402,6 +402,12 @@ and talking to buyers, not polish.
   (opened, then merged, at the operator's request) — decided afterward
   that PRs are unnecessary ceremony for a solo project and we're back to
   pushing straight to `main`, which auto-deploys via Cloudflare as before.
+- [x] **Visual polish** — icons (`lucide-react` — small, tree-shakeable,
+      standard with Tailwind) and a unified `components/SiteHeader.tsx`
+      replacing 5 separate hand-rolled headers across the public pages.
+      Homepage got an accent-colored hero band instead of a plain text
+      tagline. Same branding applied to the admin login/header. Addresses
+      the "site is looking so blank" feedback.
 
 ### Not yet done — from the differentiation discussion
 
@@ -420,19 +426,10 @@ Two more ideas came up when discussing how to differ from MagicBricks/
 
 ### Notes for next session
 
-- **Visual polish is still pending** — the operator asked for icons, a
-  proper site header, and more use of the theme's accent color ("site is
-  looking so blank"); we got pulled into the differentiation discussion
-  and two features instead. Still worth doing: no icon library installed
-  yet (lucide-react was the plan — small, tree-shakeable, standard
-  pairing with Tailwind), and there are 5 separate hand-rolled `<header>`
-  blocks across the public pages (`app/page.tsx`, `app/projects/[slug]`,
-  `app/localities`, `app/localities/[slug]`) worth unifying into one
-  shared component while doing this.
-- A second staff account may exist by now — the operator was walked
-  through adding one (Supabase Dashboard → Add user → insert into
-  `profiles`), but whether it was actually created wasn't confirmed
-  back in this file.
+- A second staff account exists (confirmed by the operator this session,
+  same "Add user → insert into `profiles`" process as the first).
+- **Still blocked: Maps Embed API key** for the neighbourhood-landmarks
+  feature — see "Not yet done" above for exactly what's needed.
 - All 54 seeded localities still have `description = null` — the locality
   pages work fine without it, but that column is the actual SEO
   content (one honest paragraph per area, per `seed-localities.sql`'s own
