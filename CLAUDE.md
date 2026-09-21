@@ -438,12 +438,37 @@ natural place until/unless a dedicated field is wanted. Explicitly ruled
 out for this whole feature: Places API / traffic layer / crime data —
 billable SKUs or no honest free data source.
 
+### Legal / compliance status
+
+Asked about directly this session — where things actually stand:
+- **TG-RERA agent registration**: status unknown to this file — the
+  operator was asked but hadn't confirmed. This is the one item that can
+  actually block publishing real listings (Telangana enforces this with
+  show-cause notices), and takes weeks to process. Worth confirming next
+  session, since it's not a coding task and has a long lead time.
+- **DPDP privacy policy**: done — see the Privacy Policy bullet above.
+- **Copyright**: no action needed. Site content is automatically
+  copyrighted on creation under Indian law; no registration required. The
+  actual risk is the reverse — don't copy builder photos/brochure text
+  without permission. A footer copyright line was added as routine
+  practice, not because anything required it.
+- **Trademarking "Homy Realty"**: optional, not discussed further, not a
+  launch blocker.
+
 ### Notes for next session
 
+- [x] **Privacy Policy page** (`app/privacy/page.tsx`) — plain-language,
+      covers what's collected (anonymous browsing, enquiry details,
+      analytics), why, who sees it (explicitly distinguishes internal
+      staff from the analytics tools that do receive anonymized data —
+      important to be precise here, not blanket-claim "never shared with
+      anyone"), DPDP rights, and retention. Contact point is the existing
+      public WhatsApp number — nothing new exposed. Linked from the
+      enquiry form's consent checkbox and a new `components/SiteFooter.tsx`
+      on all five public pages. Verified in-browser: both links work,
+      content renders correctly.
 - A second staff account exists (confirmed by the operator this session,
   same "Add user → insert into `profiles`" process as the first).
-- **Add `NEXT_PUBLIC_GOOGLE_MAPS_EMBED_KEY` to Cloudflare's env vars** —
-  see the Maps Embed bullet above. Everything else needed is done.
 - All 54 seeded localities still have `description = null` — the locality
   pages work fine without it, but that column is the actual SEO
   content (one honest paragraph per area, per `seed-localities.sql`'s own
@@ -456,11 +481,12 @@ billable SKUs or no honest free data source.
   analytics trackers also need their own consent gate before launch is
   worth a real legal read, not a guess — flagging it rather than deciding
   it here.
-- `.env.local` has the real Supabase URL/anon key, WhatsApp number, and
-  all three analytics keys. RERA agent number env var is still blank —
-  fill in `NEXT_PUBLIC_RERA_AGENT_NUMBER` once known (never commit this
-  file — it's gitignored). If the Maps Embed API key above gets added,
-  it'll need a `NEXT_PUBLIC_GOOGLE_MAPS_EMBED_KEY`-style entry too.
+- `.env.local` and Cloudflare's env vars both have the real Supabase
+  URL/anon key, WhatsApp number, all three analytics keys, and the Maps
+  Embed key — 8 vars total, all in sync between local and production.
+  RERA agent number env var is still blank — fill in
+  `NEXT_PUBLIC_RERA_AGENT_NUMBER` once known (never commit `.env.local`
+  itself — it's gitignored).
 - Still only one real project ("Aranya Skyline", Gachibowli) with one
   listing — everything else in the DB is the seeded localities. Two test
   leads exist from verifying the enquiry form / matching this session
@@ -468,9 +494,6 @@ billable SKUs or no honest free data source.
   to delete from Table Editor once done testing. Fair Price Check won't
   show anything meaningful, and the filter UI hasn't been exercised
   against a realistic result set, until more real listings exist.
-- The enquiry form links to no privacy policy page yet (none exists).
-  Compliance requires one before launch regardless — add it and link it
-  from the consent checkbox before going live.
 - Run the app locally with `npm run dev`.
 
 _Update this section at the end of every session._
