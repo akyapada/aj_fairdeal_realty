@@ -7,7 +7,7 @@ import { BHK_OPTIONS, BUDGET_BUCKETS } from "@/lib/filters";
 import type { Locality } from "@/lib/localities";
 
 const CONSENT_TEXT =
-  "I agree that AJ FairDeal Realty may contact me by phone, SMS or WhatsApp about this and similar properties, using the details I've provided here.";
+  "I agree that Homy Realty may contact me by phone, SMS or WhatsApp about this and similar properties, using the details I've provided here.";
 
 const PURPOSE_OPTIONS = [
   { value: "end_use", label: "To live in" },

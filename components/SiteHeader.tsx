@@ -38,7 +38,7 @@ export default function SiteHeader({
                   className="block text-lg font-extrabold leading-tight"
                   style={{ color: "var(--ink)", fontFamily: "var(--font-bricolage)" }}
                 >
-                  AJ FairDeal Realty
+                  Homy Realty
                 </span>
                 <span className="block text-xs leading-tight" style={{ color: "var(--ink-3)" }}>
                   Hyderabad

@@ -31,7 +31,7 @@ export default async function ProtectedAdminLayout({ children }: { children: Rea
               <Building2 size={16} color="var(--accent-ink)" strokeWidth={2.25} />
             </span>
             <span className="text-sm font-extrabold" style={{ color: "var(--ink)" }}>
-              AJ FairDeal Realty
+              Homy Realty
             </span>
             <span className="text-sm" style={{ color: "var(--ink-2)" }}>
               Admin

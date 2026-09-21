@@ -45,7 +45,7 @@ export default function AdminLoginPage() {
             <Building2 size={22} color="var(--accent-ink)" strokeWidth={2.25} />
           </span>
           <h1 className="text-lg font-extrabold" style={{ color: "var(--ink)" }}>
-            AJ FairDeal Realty
+            Homy Realty
           </h1>
           <p className="text-sm" style={{ color: "var(--ink-2)" }}>
             Staff sign-in

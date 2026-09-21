@@ -68,7 +68,7 @@ export async function generateMetadata({
     title: `Apartments & Villas for Sale in ${locality.name}${zoneSuffix}`,
     description:
       locality.description?.slice(0, 155) ??
-      `Browse new-launch and resale apartments and villas for sale in ${locality.name}${zoneSuffix}. Honest, well-structured listings from AJ FairDeal Realty.`,
+      `Browse new-launch and resale apartments and villas for sale in ${locality.name}${zoneSuffix}. Honest, well-structured listings from Homy Realty.`,
   };
 }
 

@@ -5,7 +5,7 @@ import { buildWhatsAppLink } from "@/lib/whatsapp";
 
 export const metadata: Metadata = {
   title: "Privacy Policy",
-  description: "What AJ FairDeal Realty collects, why, and how you can access, correct, or delete it.",
+  description: "What Homy Realty collects, why, and how you can access, correct, or delete it.",
 };
 
 const LAST_UPDATED = "22 September 2026";
@@ -25,7 +25,7 @@ function Section({ title, children }: { title: string; children: React.ReactNode
 
 export default function PrivacyPolicyPage() {
   const whatsAppLink = buildWhatsAppLink(
-    "Hi, I have a question about my data on AJ FairDeal Realty."
+    "Hi, I have a question about my data on Homy Realty."
   );
 
   return (
@@ -40,7 +40,7 @@ export default function PrivacyPolicyPage() {
           Last updated {LAST_UPDATED}
         </p>
         <p className="mt-4 text-sm leading-relaxed" style={{ color: "var(--ink-2)" }}>
-          AJ FairDeal Realty is a real estate consultancy based in Hyderabad. This page explains,
+          Homy Realty is a real estate consultancy based in Hyderabad. This page explains,
           in plain language, what information we collect through this website, why, and what
           rights you have over it under India&apos;s Digital Personal Data Protection Act, 2023.
         </p>

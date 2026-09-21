@@ -27,8 +27,8 @@ const BASE_URL = "https://homyrealty.com";
 export const metadata: Metadata = {
   metadataBase: new URL(BASE_URL),
   title: {
-    default: "AJ FairDeal Realty — Hyderabad Apartments & Villas",
-    template: "%s | AJ FairDeal Realty",
+    default: "Homy Realty — Hyderabad Apartments & Villas",
+    template: "%s | Homy Realty",
   },
   description:
     "Honest, well-structured listings of new-launch and resale apartments and villas across Hyderabad.",
@@ -37,7 +37,7 @@ export const metadata: Metadata = {
 const organizationJsonLd = {
   "@context": "https://schema.org",
   "@type": "RealEstateAgent",
-  name: "AJ FairDeal Realty",
+  name: "Homy Realty",
   url: BASE_URL,
   areaServed: {
     "@type": "City",
