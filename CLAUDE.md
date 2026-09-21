@@ -348,21 +348,23 @@ and talking to buyers, not polish.
       page groups correctly by zone, Gachibowli shows the one real listing
       with the right SEO title, Kokapet (no listings) shows the empty
       state, and an invalid slug 404s properly.
-- [~] Step 12 (deploy, domain, sitemap, robots.txt, JSON-LD) — **partially
-      done**. Domain bought: **homyrealty.com** (via Cloudflare Registrar).
-      Code pushed to GitHub (`akyapada/aj_fairdeal_realty`). Deployment
-      tooling set up: `@cloudflare/next-on-pages` doesn't support Next.js
-      16 yet, so this uses **Cloudflare Workers via the OpenNext adapter**
-      instead (`@opennextjs/cloudflare`, `wrangler.jsonc`, `open-next.config.ts`,
-      `npm run deploy`/`npm run preview` scripts) — same free tier, same
-      reasons for picking Cloudflare over Vercel, just the current
-      supported path rather than the older "Pages" adapter. Verified
-      locally with `npm run preview` (real Workers runtime via `wrangler`,
-      not just `next build`) — Supabase queries, the enquiry form, and
-      the WhatsApp button all work correctly on it. **Not yet done:**
-      actually connecting the GitHub repo to a Cloudflare Workers project
-      in the dashboard, adding the env vars there, attaching the domain,
-      and the sitemap/robots.txt/JSON-LD pieces.
+- [~] Step 12 (deploy, domain, sitemap, robots.txt, JSON-LD) — **mostly
+      done**. **The site is live at https://homyrealty.com** — domain
+      bought via Cloudflare Registrar, code on GitHub
+      (`akyapada/aj_fairdeal_realty`), deployed to Cloudflare Workers via
+      the OpenNext adapter (`@cloudflare/next-on-pages` doesn't support
+      Next.js 16 yet, so this uses `@opennextjs/cloudflare` +
+      `wrangler.jsonc` + `open-next.config.ts` instead — same free tier,
+      same reasons for picking Cloudflare over Vercel, just the current
+      supported path). Cloudflare project connects to the GitHub repo
+      directly (Workers Builds), build command
+      `npx opennextjs-cloudflare build`, deploy command `npx wrangler
+      deploy`, all 7 `NEXT_PUBLIC_*` env vars added in the dashboard's
+      Variables and Secrets. Verified end-to-end on the real production
+      domain — real Supabase data, locality browsing, all correct.
+      **Not yet done:** sitemap.xml, robots.txt, JSON-LD structured data.
+      Every push to `main` on GitHub will now auto-redeploy — no manual
+      deploy step needed going forward.
 - [x] **Staff leads dashboard** (`/admin`) — not in the original 12-step
       build order; added after the operator asked for something friendlier
       than raw Table Editor for the field team. See "Staff leads
