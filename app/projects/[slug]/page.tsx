@@ -18,6 +18,7 @@ import ViewTracker from "@/components/ViewTracker";
 import SiteHeader from "@/components/SiteHeader";
 import { buildWhatsAppLink } from "@/lib/whatsapp";
 import { getLocalityPriceBenchmark, formatDeltaVsBenchmark } from "@/lib/price-benchmark";
+import { buildMapEmbedUrl } from "@/lib/maps";
 
 interface Locality {
   name: string;
@@ -181,6 +182,16 @@ export default async function ProjectPage({
   const whatsAppLink = buildWhatsAppLink(
     `Hi, I'm interested in ${project.name} in ${project.localities?.name ?? "Hyderabad"}. Can you share more details?`
   );
+
+  const mapQuery =
+    project.latitude && project.longitude
+      ? `${project.latitude},${project.longitude}`
+      : project.address
+        ? `${project.address}, ${project.localities?.name ?? ""} Hyderabad`
+        : project.localities?.name
+          ? `${project.name}, ${project.localities.name}, Hyderabad`
+          : null;
+  const mapEmbedUrl = mapQuery ? buildMapEmbedUrl(mapQuery) : null;
 
   const listingJsonLd = {
     "@context": "https://schema.org",
@@ -414,6 +425,31 @@ export default async function ProjectPage({
                     {a.replace(/_/g, " ")}
                   </span>
                 ))}
+              </div>
+            </div>
+          )}
+
+          {mapEmbedUrl && (
+            <div
+              className="rounded-[var(--radius)] border p-4"
+              style={{ borderColor: "var(--line)", background: "var(--surface)" }}
+            >
+              <h2 className="flex items-center gap-1.5 text-sm font-semibold uppercase tracking-wide" style={{ color: "var(--ink-3)" }}>
+                <MapPin size={14} />
+                Location
+              </h2>
+              <div
+                className="mt-2.5 aspect-[16/9] overflow-hidden rounded-md border"
+                style={{ borderColor: "var(--line)" }}
+              >
+                <iframe
+                  src={mapEmbedUrl}
+                  className="h-full w-full"
+                  style={{ border: 0 }}
+                  loading="lazy"
+                  referrerPolicy="no-referrer-when-downgrade"
+                  title={`Map showing ${project.name}`}
+                />
               </div>
             </div>
           )}
