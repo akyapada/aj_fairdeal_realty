@@ -273,9 +273,31 @@ and talking to buyers, not polish.
       Business (not a VoIP number — those get flagged/banned by WhatsApp's
       anti-fraud checks, which is a bad risk for the number leads actually
       call), registered by the operator this session: `918897327276`.
+- [x] PostHog + Clarity + GA4 (step 10). `components/Analytics.tsx`,
+      mounted once in the root layout, loads all three — each reads its
+      own env var and simply doesn't load if that var is blank, so any
+      subset can be wired in independently. GA4 and Clarity load via
+      `next/script` (no npm dependency needed — both are just tracking
+      snippets). PostHog needed one dependency, `posthog-js` — the
+      official client SDK; there's no way to call PostHog's ingestion API
+      without it. All three fire a manual pageview/event on every route
+      change, since Next's App Router swaps pages without a full document
+      reload and none of these trackers see that for free. Verified live in
+      the browser via `performance.getEntriesByType` (not the browser
+      tool's network-request log, which still doesn't seem to catch these):
+      confirmed `gtag/js`, PostHog's `/e/` event endpoint, and Clarity's
+      `collect` endpoint all fired. Accounts, in case they're needed again:
+      PostHog project key `phc_rnQu...` (US Cloud), Clarity project
+      `ylpkmbczhy`, GA4 property `G-KBZ0JBG3RL`.
 
 ### Notes for next session
 
+- Analytics load unconditionally right now — no cookie/tracking consent
+  banner gates PostHog, Clarity or GA4. DPDP's consent requirement is
+  currently wired only for lead capture (`leads.consent_given`); whether
+  analytics trackers also need their own consent gate before launch is
+  worth a real legal read, not a guess — flagging it rather than deciding
+  it here.
 - `.env.local` is filled in with the real Supabase URL/anon key and
   WhatsApp number. RERA agent number env var is still blank — fill in
   `NEXT_PUBLIC_RERA_AGENT_NUMBER` in `.env.local` once known (never commit
