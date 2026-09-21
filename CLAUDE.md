@@ -75,15 +75,57 @@ painful to change later, pages are trivial.
 | Images | Cloudinary free tier | |
 | Maps | Maps Embed API only | Unlimited free. **Never** use billable Maps SKUs — they have no hard billing cap |
 | WhatsApp | `wa.me` click-to-chat links | **No** Business API. Per-message costs are not affordable yet |
-| Admin | Supabase table editor | **Do not build a custom admin portal in v1** |
+| Admin | `/admin` leads dashboard (Supabase Auth) + Supabase table editor for everything else | See "Staff leads dashboard" below — scope is leads only, deliberately |
 
 ### Explicitly NOT in v1
-- Buyer logins (kills SEO and conversion when nobody knows the brand)
+- Buyer logins (kills SEO and conversion when nobody knows the brand — this
+  is about buyers; staff have their own separate `/admin` login, see below)
 - SMS OTP / DLT registration
 - WhatsApp Business API
-- A custom admin dashboard
+- **A full admin CRM/CMS** — project and listing management still goes
+  through Supabase Table Editor. A *leads-only* dashboard was built (see
+  below); this line is about not going further than that.
 - Any ML or recommendation engine
 - Native mobile apps
+
+### Staff leads dashboard (`/admin`)
+
+Added after v1 planning, once real use surfaced a genuine gap: raw Table
+Editor was too technical for the field team's daily use. `property-console.html`
+already had the design for this — a fourth "Admin › Leads" screen — but its
+own inline note said not to build it in v1, since the `lead_scores` view
+gives most of the value for free. It's now built for real, deliberately
+scoped to **leads only**:
+
+- `middleware.ts` + `lib/supabase-browser.ts` + `lib/supabase-server.ts` —
+  Supabase Auth session handling (via `@supabase/ssr`), scoped to
+  `/admin/*` only so public pages pay zero cost.
+- `app/admin/login/page.tsx` — email+password sign-in. **No self-serve
+  signup** — staff accounts are provisioned manually (Supabase Dashboard →
+  Authentication → Users → Add user, then one SQL insert into `profiles`;
+  see the schema's own notes at the bottom of `schema.sql`).
+- `app/admin/(protected)/page.tsx` — KPI tiles + the full leads table
+  sorted by score (`lead_scores` view), matching the prototype's exact
+  columns.
+- `app/admin/(protected)/leads/[id]/page.tsx` — latest requirement,
+  engagement, activity timeline, and **one combined form** to log an
+  activity and optionally change status in the same action (this used to
+  be two separate controls — a status dropdown that auto-saved on every
+  click, which was genuinely bad: easy to misclick and silently commit a
+  real status change plus a fake audit-log entry. Fixed by merging into
+  one explicit-submit form).
+- **RLS already scopes all of this correctly** — a non-admin agent only
+  ever sees their own leads (`staff read own leads` policy); admins see
+  everything. The dashboard's queries go through the real `leads` table
+  first (guaranteed-correct RLS) and only enrich those already-authorized
+  rows with scores/requirements, rather than trusting the `lead_scores`
+  view's own RLS behavior — defense in depth, since view RLS semantics in
+  Postgres have real sharp edges worth not relying on blindly.
+- `listing_views` (page-view engagement) is admin-only by existing RLS
+  (`admins read views` policy) — a regular agent will correctly see 0
+  views on every lead detail page. That's not a bug.
+- Projects, listings, builders, media: still Table Editor only. Not in
+  scope here.
 
 ---
 
@@ -306,9 +348,42 @@ and talking to buyers, not polish.
       page groups correctly by zone, Gachibowli shows the one real listing
       with the right SEO title, Kokapet (no listings) shows the empty
       state, and an invalid slug 404s properly.
+- [~] Step 12 (deploy, domain, sitemap, robots.txt, JSON-LD) — **partially
+      done**. Domain bought: **homyrealty.com** (via Cloudflare Registrar).
+      Code pushed to GitHub (`akyapada/aj_fairdeal_realty`). Deployment
+      tooling set up: `@cloudflare/next-on-pages` doesn't support Next.js
+      16 yet, so this uses **Cloudflare Workers via the OpenNext adapter**
+      instead (`@opennextjs/cloudflare`, `wrangler.jsonc`, `open-next.config.ts`,
+      `npm run deploy`/`npm run preview` scripts) — same free tier, same
+      reasons for picking Cloudflare over Vercel, just the current
+      supported path rather than the older "Pages" adapter. Verified
+      locally with `npm run preview` (real Workers runtime via `wrangler`,
+      not just `next build`) — Supabase queries, the enquiry form, and
+      the WhatsApp button all work correctly on it. **Not yet done:**
+      actually connecting the GitHub repo to a Cloudflare Workers project
+      in the dashboard, adding the env vars there, attaching the domain,
+      and the sitemap/robots.txt/JSON-LD pieces.
+- [x] **Staff leads dashboard** (`/admin`) — not in the original 12-step
+      build order; added after the operator asked for something friendlier
+      than raw Table Editor for the field team. See "Staff leads
+      dashboard" under Stack above for the full writeup. Verified
+      end-to-end in the browser with a real login: dashboard KPIs and
+      leads table render correctly, lead detail page shows real
+      requirement/engagement data, logging an activity works, and the
+      combined activity+status form (fixed from an earlier auto-save
+      dropdown that committed on every click — a real bug caught during
+      testing) saves correctly on explicit submit.
 
 ### Notes for next session
 
+- Next up: finish step 12 — connect the GitHub repo to a Cloudflare
+  Workers project (dashboard → Workers & Pages → Create → Import a
+  repository), set the deploy command to `npm run deploy`, add the env
+  vars listed earlier in this file's history to the project's Settings →
+  Variables and Secrets, deploy, then attach `homyrealty.com`. After that:
+  sitemap.xml, robots.txt, JSON-LD structured data.
+- One real staff admin account exists (created this session, linked to a
+  `profiles` row with `role = 'admin'`) — that's how `/admin` was tested.
 - All 54 seeded localities still have `description = null` — the locality
   pages work fine without it, but that column is the actual SEO
   content (one honest paragraph per area, per `seed-localities.sql`'s own
