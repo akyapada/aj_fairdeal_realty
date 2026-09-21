@@ -10,12 +10,9 @@ import {
   PROPERTY_TYPE_OPTIONS,
   parseFilters,
 } from "@/lib/filters";
+import type { Locality } from "@/lib/localities";
 
-interface Locality {
-  id: number;
-  name: string;
-  slug: string;
-}
+const ZONES = ["West", "North", "East", "South", "Central"] as const;
 
 const chipBase =
   "rounded-full border px-3 py-1.5 text-sm transition-colors cursor-pointer select-none";
@@ -91,8 +88,106 @@ function FilterSection({
           ▾
         </span>
       </button>
-      {open && <div className="mt-2.5 flex flex-wrap gap-1.5">{children}</div>}
+      {open && <div className="mt-2.5 flex flex-col gap-2.5">{children}</div>}
     </div>
+  );
+}
+
+function LocalityFilter({
+  localities,
+  selected,
+  onToggle,
+}: {
+  localities: Locality[];
+  selected: string[];
+  onToggle: (slug: string) => void;
+}) {
+  const [zone, setZone] = useState("all");
+  const [search, setSearch] = useState("");
+  const [searchOpen, setSearchOpen] = useState(false);
+
+  const results = localities.filter(
+    (l) =>
+      (zone === "all" || l.zone === zone) &&
+      l.name.toLowerCase().includes(search.toLowerCase())
+  );
+
+  const selectedLocalities = localities.filter((l) => selected.includes(l.slug));
+
+  return (
+    <>
+      <select
+        value={zone}
+        onChange={(e) => setZone(e.target.value)}
+        className="w-full rounded-md border px-3 py-2 text-sm"
+        style={{ background: "var(--surface)", borderColor: "var(--line)", color: "var(--ink)" }}
+      >
+        <option value="all">All zones</option>
+        {ZONES.map((z) => (
+          <option key={z} value={z}>
+            {z} Hyderabad
+          </option>
+        ))}
+      </select>
+
+      <div className="relative">
+        <input
+          type="text"
+          value={search}
+          onChange={(e) => {
+            setSearch(e.target.value);
+            setSearchOpen(true);
+          }}
+          onFocus={() => setSearchOpen(true)}
+          onBlur={() => setTimeout(() => setSearchOpen(false), 150)}
+          placeholder={zone === "all" ? "Search a locality…" : `Search in ${zone} Hyderabad…`}
+          className="w-full rounded-md border px-3 py-2 text-sm"
+          style={{ background: "var(--surface)", borderColor: "var(--line)", color: "var(--ink)" }}
+        />
+        {searchOpen && (
+          <div
+            className="absolute z-10 mt-1 max-h-56 w-full overflow-y-auto rounded-md border shadow-lg"
+            style={{ background: "var(--surface)", borderColor: "var(--line)", boxShadow: "var(--shadow)" }}
+          >
+            {results.length === 0 ? (
+              <div className="px-3 py-2 text-sm" style={{ color: "var(--ink-3)" }}>
+                No localities match.
+              </div>
+            ) : (
+              results.map((loc) => (
+                <button
+                  key={loc.slug}
+                  type="button"
+                  onMouseDown={(e) => e.preventDefault()}
+                  onClick={() => {
+                    onToggle(loc.slug);
+                    setSearch("");
+                  }}
+                  className="flex w-full items-center justify-between px-3 py-2 text-left text-sm"
+                  style={{
+                    color: selected.includes(loc.slug) ? "var(--accent)" : "var(--ink)",
+                    background: selected.includes(loc.slug) ? "var(--accent-soft)" : "transparent",
+                  }}
+                >
+                  {loc.name}
+                  {selected.includes(loc.slug) && <span>✓</span>}
+                </button>
+              ))
+            )}
+          </div>
+        )}
+      </div>
+
+      {selectedLocalities.length > 0 && (
+        <div className="flex flex-wrap gap-1.5">
+          {selectedLocalities.map((loc) => (
+            <Chip key={loc.slug} active onClick={() => onToggle(loc.slug)}>
+              {loc.name} ×
+            </Chip>
+          ))}
+        </div>
+      )}
+    </>
   );
 }
 
@@ -157,15 +252,17 @@ export default function FilterPanel({ localities }: { localities: Locality[] }) 
       </div>
 
       <FilterSection label="Bedrooms" count={filters.bhk.length} defaultOpen={true}>
-        {BHK_OPTIONS.map((n) => (
-          <Chip
-            key={n}
-            active={filters.bhk.includes(n)}
-            onClick={() => toggleInList("bhk", filters.bhk.map(String), String(n))}
-          >
-            {n} BHK
-          </Chip>
-        ))}
+        <div className="flex flex-wrap gap-1.5">
+          {BHK_OPTIONS.map((n) => (
+            <Chip
+              key={n}
+              active={filters.bhk.includes(n)}
+              onClick={() => toggleInList("bhk", filters.bhk.map(String), String(n))}
+            >
+              {n} BHK
+            </Chip>
+          ))}
+        </div>
       </FilterSection>
 
       <div className="border-b py-3" style={{ borderColor: "var(--line)" }}>
@@ -187,51 +284,53 @@ export default function FilterPanel({ localities }: { localities: Locality[] }) 
       </div>
 
       <FilterSection label="Locality" count={filters.locality.length} defaultOpen={false}>
-        {localities.map((loc) => (
-          <Chip
-            key={loc.slug}
-            active={filters.locality.includes(loc.slug)}
-            onClick={() => toggleInList("loc", filters.locality, loc.slug)}
-          >
-            {loc.name}
-          </Chip>
-        ))}
+        <LocalityFilter
+          localities={localities}
+          selected={filters.locality}
+          onToggle={(slug) => toggleInList("loc", filters.locality, slug)}
+        />
       </FilterSection>
 
       <FilterSection label="Property type" count={filters.propertyType.length} defaultOpen={false}>
-        {PROPERTY_TYPE_OPTIONS.map((opt) => (
-          <Chip
-            key={opt.value}
-            active={filters.propertyType.includes(opt.value)}
-            onClick={() => toggleInList("type", filters.propertyType, opt.value)}
-          >
-            {opt.label}
-          </Chip>
-        ))}
+        <div className="flex flex-wrap gap-1.5">
+          {PROPERTY_TYPE_OPTIONS.map((opt) => (
+            <Chip
+              key={opt.value}
+              active={filters.propertyType.includes(opt.value)}
+              onClick={() => toggleInList("type", filters.propertyType, opt.value)}
+            >
+              {opt.label}
+            </Chip>
+          ))}
+        </div>
       </FilterSection>
 
       <FilterSection label="Status" count={filters.constructionStatus.length} defaultOpen={false}>
-        {CONSTRUCTION_STATUS_OPTIONS.map((opt) => (
-          <Chip
-            key={opt.value}
-            active={filters.constructionStatus.includes(opt.value)}
-            onClick={() => toggleInList("status", filters.constructionStatus, opt.value)}
-          >
-            {opt.label}
-          </Chip>
-        ))}
+        <div className="flex flex-wrap gap-1.5">
+          {CONSTRUCTION_STATUS_OPTIONS.map((opt) => (
+            <Chip
+              key={opt.value}
+              active={filters.constructionStatus.includes(opt.value)}
+              onClick={() => toggleInList("status", filters.constructionStatus, opt.value)}
+            >
+              {opt.label}
+            </Chip>
+          ))}
+        </div>
       </FilterSection>
 
       <FilterSection label="Sale type" count={filters.kind.length} defaultOpen={false}>
-        {KIND_OPTIONS.map((opt) => (
-          <Chip
-            key={opt.value}
-            active={filters.kind.includes(opt.value)}
-            onClick={() => toggleInList("kind", filters.kind, opt.value)}
-          >
-            {opt.label}
-          </Chip>
-        ))}
+        <div className="flex flex-wrap gap-1.5">
+          {KIND_OPTIONS.map((opt) => (
+            <Chip
+              key={opt.value}
+              active={filters.kind.includes(opt.value)}
+              onClick={() => toggleInList("kind", filters.kind, opt.value)}
+            >
+              {opt.label}
+            </Chip>
+          ))}
+        </div>
       </FilterSection>
     </aside>
   );
