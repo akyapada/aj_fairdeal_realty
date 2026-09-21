@@ -409,27 +409,41 @@ and talking to buyers, not polish.
       tagline. Same branding applied to the admin login/header. Addresses
       the "site is looking so blank" feedback.
 
+- [x] **Maps Embed API location section** — `lib/maps.ts` +
+      `app/projects/[slug]/page.tsx`. A Google Cloud project ("HomyReality")
+      was created, Maps Embed API enabled (the *only* Maps SKU this
+      project is allowed to use — never enable Places/Directions/traffic
+      layer on this key's project, they're billable with no hard cap),
+      and the key restricted to `homyrealty.com/*` + `localhost:3000/*`
+      and to Maps Embed API only. Renders a "Location" section on each
+      project page — falls back lat/long → address → project name +
+      locality, whichever is set, and renders nothing if the env var is
+      blank. Verified in-browser: real map loads for Aranya Skyline. **The
+      key still needs adding to Cloudflare's env vars** (Settings →
+      Variables and Secrets → `NEXT_PUBLIC_GOOGLE_MAPS_EMBED_KEY`) — it's
+      only in local `.env.local` so far, so the live site won't show the
+      map until that's done.
+
 ### Not yet done — from the differentiation discussion
 
-Two more ideas came up when discussing how to differ from MagicBricks/
+One more idea came up when discussing how to differ from MagicBricks/
 99acres/Zillow, not yet built:
 - **Days-on-market transparency** ("Listed 23 days ago") — trivial once
   wanted, `listings.created_at` already exists.
-- **Neighbourhood landmarks on a map** — schools/hospitals/malls noted in
-  your own words (honest, free) plus a `Maps Embed API` iframe (the only
-  Maps SKU this project is allowed to use — see Stack). **Blocked on a
-  Google Cloud API key** (Maps Embed API enabled, restricted to
-  `homyrealty.com/*` and `localhost:3000/*`) that was requested but never
-  provided. Explicitly ruled out: Places API / traffic layer / crime data
-  — billable SKUs or no honest free data source, see the conversation
-  where this was scoped for the reasoning.
+
+The neighbourhood-landmarks idea (schools/hospitals/malls in your own
+words, next to the map above) still needs the actual landmark content —
+there's no dedicated DB column for it yet; `projects.description` is the
+natural place until/unless a dedicated field is wanted. Explicitly ruled
+out for this whole feature: Places API / traffic layer / crime data —
+billable SKUs or no honest free data source.
 
 ### Notes for next session
 
 - A second staff account exists (confirmed by the operator this session,
   same "Add user → insert into `profiles`" process as the first).
-- **Still blocked: Maps Embed API key** for the neighbourhood-landmarks
-  feature — see "Not yet done" above for exactly what's needed.
+- **Add `NEXT_PUBLIC_GOOGLE_MAPS_EMBED_KEY` to Cloudflare's env vars** —
+  see the Maps Embed bullet above. Everything else needed is done.
 - All 54 seeded localities still have `description = null` — the locality
   pages work fine without it, but that column is the actual SEO
   content (one honest paragraph per area, per `seed-localities.sql`'s own
