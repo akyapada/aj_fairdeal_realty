@@ -1,0 +1,238 @@
+# Hyderabad Real Estate Platform
+
+Claude Code reads this file automatically at the start of every session.
+Keep the **Current status** section at the bottom updated as work completes.
+
+---
+
+## What this is
+
+A real estate consultancy website for Hyderabad. Two audiences:
+
+1. **Buyers** — browse projects, see honest information, submit requirements.
+   No login required, ever.
+2. **Us (admin/agents)** — see who is visiting, what they looked at, what they
+   want, and who to call first.
+
+The differentiator is **honest, well-structured information** and
+**understanding buyer requirements better than the portals do** — not having
+more listings than 99acres. We will never win on volume.
+
+---
+
+## Who you are working with
+
+The operator is **not a professional developer**. They know basic SQL and some
+frontend concepts, enough to read code and spot when something looks wrong,
+but not enough to debug a stack trace alone.
+
+This changes how you should work:
+
+- **Explain before doing** anything structural. One or two sentences, plain
+  language, no jargon.
+- **Never leave a broken state.** If a change spans several files, finish it.
+- **Prefer boring, mainstream, well-documented choices.** Every clever
+  dependency is a future debugging session they cannot do without help.
+- When something fails, **say what failed and what you are doing about it**
+  rather than silently trying another approach.
+- **Do not add dependencies** without saying why in one line.
+
+---
+
+## Constraints
+
+- Budget: ₹50k–1L total for 6 months. Effectively zero ad budget.
+- Acquisition is SEO + content + video walkthroughs + existing network.
+- Solo operator plus 1–2 agents.
+- **Everything must run on free tiers.** If a change would require a paid
+  service, stop and say so before writing the code.
+
+---
+
+## Scope: model everything, build a slice
+
+`schema.sql` models the full business: apartments, villas, plots, commercial,
+new launch, resale, rentals.
+
+**The website v1 surfaces only:** new-launch and resale **apartments and
+villas**, **for sale**.
+
+Commercial, plots and rentals stay in the database, hidden from the UI, until
+the sale flow works end to end. Do not build UI for them yet — schemas are
+painful to change later, pages are trivial.
+
+---
+
+## Stack
+
+| Layer | Choice | Notes |
+|---|---|---|
+| Framework | Next.js (App Router) + TypeScript | Server-rendered; SEO is the whole strategy |
+| Database/Auth | Supabase (free tier) | Postgres. Schema in `schema.sql` |
+| Hosting | **Cloudflare Pages** (free) | **Not Vercel** — its Hobby plan is non-commercial personal use only, and this site is commercial. Vercel Pro is $20/mo, avoidable. Cloudflare Pages free permits commercial use and gives free DNS. |
+| Styling | Tailwind CSS | Design tokens already in `app/globals.css` |
+| Analytics | PostHog (free) + Microsoft Clarity + GA4 | Add at step 9, not before |
+| Images | Cloudinary free tier | |
+| Maps | Maps Embed API only | Unlimited free. **Never** use billable Maps SKUs — they have no hard billing cap |
+| WhatsApp | `wa.me` click-to-chat links | **No** Business API. Per-message costs are not affordable yet |
+| Admin | Supabase table editor | **Do not build a custom admin portal in v1** |
+
+### Explicitly NOT in v1
+- Buyer logins (kills SEO and conversion when nobody knows the brand)
+- SMS OTP / DLT registration
+- WhatsApp Business API
+- A custom admin dashboard
+- Any ML or recommendation engine
+- Native mobile apps
+
+---
+
+## Design
+
+`property-console.html` in the project root is a working prototype of all four
+screens, with every element labelled with its database column. **Port its
+visual design** — colors, type scale, spacing, component shapes — into the
+Next.js app. It is the design reference, not throwaway.
+
+Design tokens are already extracted into `app/globals.css`.
+
+---
+
+## Database
+
+Full schema: `schema.sql`. Seed data: `seed-localities.sql`.
+
+Key conventions — these are not negotiable:
+
+- **`listings` is the searchable unit.** Everything a buyer can enquire about
+  is a row here. New-launch configs, resale units and rentals all live in this
+  one table, discriminated by `kind`. Search stays one indexed query.
+- **`lead_requirements` is append-only.** Never UPDATE a requirement — INSERT
+  a new row. The history of how a buyer's brief changes is the dataset that
+  makes prediction possible later. This is the single most important
+  convention in the project.
+- **`listing_views` records anonymous sessions.** When someone submits their
+  phone number, `submit_enquiry()` backfills `lead_id` across their whole
+  session history. Do not break this.
+- **Enums, not free text**, for anything filterable.
+- **`workplace_locality_id`** on requirements is Hyderabad-specific and highly
+  predictive of locality choice. Always ask for it in forms.
+
+### Security — non-negotiable
+
+- RLS is ON for every table.
+- `leads` has **no** public read policy. The only public write path is the
+  `submit_enquiry()` security-definer function. Never query `leads` from a
+  client component.
+- **Known gap in v1:** `listings.owner_name` / `owner_phone` / `owner_notes`
+  are readable under the public listings policy. Move them to a separate
+  `listing_owners` table before listing any real resale property.
+- `internal_pros`, `internal_cons`, `internal_notes` and `owner_*` must
+  **never** be selected in a public page query. Use explicit column lists,
+  never `select *`, on the public site.
+- Before launch, verify exactly two things:
+  1. An unauthenticated request cannot read `leads`.
+  2. Agent A cannot read Agent B's leads.
+
+---
+
+## Compliance
+
+- **TG-RERA:** every project listing must display its RERA number prominently.
+  Telangana enforces font size and clarity standards on advertisements, and has
+  issued show-cause notices over non-compliant ads. A project must not be
+  publishable without `rera_number` set.
+- **DPDP:** consent checkbox at every capture point, recorded in
+  `leads.consent_given` / `consent_at` / `consent_text` — the exact wording,
+  not just a boolean. Privacy policy page. Deletion via `is_deleted` soft delete.
+
+---
+
+## Registrations and sequencing
+
+Nothing below blocks building. They block *publishing*.
+
+| When | What | Cost |
+|---|---|---|
+| Week 1 | Buy domain (before any SEO content, not before code) | ~₹1,200/yr |
+| Week 1 | File TG-RERA agent application — takes weeks, run in parallel | ₹10,000 |
+| Week 1 | Supabase account, run `schema.sql` + `seed-localities.sql` | free |
+| Weeks 1–3 | Build; deploy to `*.pages.dev` when useful | free |
+| Before launch | RERA number on every listing + privacy policy + consent | free |
+
+- **Do not** register a company — RERA agent fee is ₹10,000 as an individual
+  vs ₹50,000 as an entity.
+- **Do not** publish SEO content on the free subdomain. Search authority
+  attaches to the domain; migrating later throws it away.
+- A free `*.pages.dev` URL does not change RERA exposure.
+
+---
+
+## Build order
+
+1. ~~Schema designed~~ — `schema.sql`
+2. ~~UI prototype with schema mapping~~ — `property-console.html`
+3. Supabase project + run schema + seed localities
+4. Next.js skeleton, connected to Supabase, one page rendering real data
+5. Project listing page with filters (locality, budget, BHK, status)
+6. Individual project page — RERA number, photos, pros/cons, config table
+7. Requirement capture form → `submit_enquiry()`
+8. View tracking → `record_listing_view()`
+9. WhatsApp click-to-chat, pre-filled with project name
+10. PostHog + Clarity + GA4
+11. Locality landing pages (`/localities/kokapet`) — the SEO engine
+12. Deploy, domain, sitemap, robots.txt, JSON-LD structured data
+
+**Target: live in 3–4 weeks.** Ship ugly. The remaining time goes into content
+and talking to buyers, not polish.
+
+---
+
+## Conventions
+
+- Money in INR as `numeric`. Display as lakhs/crores (`₹1.24 Cr`, `₹92 L`).
+- Areas in **sqft**, except plots which are **sq yards** (Hyderabad norm).
+- Every public page needs a unique `<title>` and meta description.
+- URLs are slug-based and permanent: `/projects/aranya-skyline`,
+  `/localities/kokapet`. **Never change a live slug** — it breaks SEO.
+- Server components for anything public (SEO). Client components only where
+  interactivity genuinely requires it.
+
+---
+
+## Current status
+
+- [x] Schema designed
+- [x] UI prototype built
+- [x] Supabase project created, schema run
+- [x] Localities seeded
+- [x] Next.js skeleton connected to Supabase (App Router + TS + Tailwind v4,
+      scaffolded via `create-next-app` and merged into this folder)
+- [x] First page rendering real data — homepage (`app/page.tsx`) queries
+      `listings` joined to `projects` (RLS-filtered to published/active,
+      apartments & villas, for sale only) and renders cards with price
+      (lakhs/crore formatting), BHK, area and RERA number, styled with the
+      ported design tokens (`app/globals.css`) and Google fonts via
+      `next/font`. Verified against live Supabase data in the browser.
+- [ ] Individual project page — RERA number, photos, pros/cons, config table
+      (step 6)
+- [ ] Project listing page with filters — locality, budget, BHK, status
+      (step 5)
+- [ ] Requirement capture form → `submit_enquiry()` (step 7)
+- [ ] View tracking → `record_listing_view()` (step 8)
+
+### Notes for next session
+
+- `.env.local` is filled in with the real Supabase URL/anon key. WhatsApp
+  number and RERA agent number env vars are still blank — fill in
+  `NEXT_PUBLIC_WHATSAPP_NUMBER` and `NEXT_PUBLIC_RERA_AGENT_NUMBER` in
+  `.env.local` once known (never commit this file — it's gitignored).
+- Only `localities` was seeded from `seed-localities.sql`. One test project
+  ("Aranya Skyline", Gachibowli) and one test listing were inserted by hand
+  via the Supabase SQL editor to verify rendering — real project/listing data
+  still needs to be entered before this is useful content.
+- This project folder is not yet a git repository. Consider running
+  `git init` once the skeleton feels stable, so changes are tracked.
+- Run the app locally with `npm run dev`.
+
+_Update this section at the end of every session._

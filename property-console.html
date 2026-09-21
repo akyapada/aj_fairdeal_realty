@@ -1,0 +1,1068 @@
+<title>Hyderabad Property Console</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
+
+<style>
+:root{
+  --paper:#F2F4F2; --surface:#FFFFFF; --surface-2:#E9EDEA; --surface-3:#DFE5E1;
+  --ink:#151C19; --ink-2:#4A554F; --ink-3:#78857E;
+  --line:#D3DBD6; --line-2:#BCC7C1;
+  --accent:#0E6B58; --accent-ink:#FFFFFF; --accent-soft:#D9EAE4;
+  --warn:#8A5410; --warn-soft:#F7E9D4;
+  --crit:#94292C; --crit-soft:#F6DEDE;
+  --good:#0E6B58; --good-soft:#D9EAE4;
+  --schema:#6F3B93; --schema-soft:#EEE3F5; --schema-line:#C8A9DC;
+  --shadow:0 1px 2px rgba(20,32,27,.06), 0 4px 14px rgba(20,32,27,.05);
+  --r:10px;
+  --fs-display:clamp(1.45rem,1.15rem + 1.3vw,2rem);
+  --fs-h2:1.08rem; --fs-body:.9rem; --fs-sm:.8rem; --fs-xs:.715rem;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --paper:#0E1412; --surface:#161E1B; --surface-2:#1D2724; --surface-3:#25312D;
+    --ink:#E7EEEA; --ink-2:#A6B4AD; --ink-3:#7A8880;
+    --line:#293430; --line-2:#37443F;
+    --accent:#3FBFA0; --accent-ink:#06211B; --accent-soft:#11302A;
+    --warn:#D6A264; --warn-soft:#31250F;
+    --crit:#E38686; --crit-soft:#351B1B;
+    --good:#3FBFA0; --good-soft:#11302A;
+    --schema:#C295E2; --schema-soft:#271937; --schema-line:#4A3260;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 4px 14px rgba(0,0,0,.28);
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#0E1412; --surface:#161E1B; --surface-2:#1D2724; --surface-3:#25312D;
+  --ink:#E7EEEA; --ink-2:#A6B4AD; --ink-3:#7A8880;
+  --line:#293430; --line-2:#37443F;
+  --accent:#3FBFA0; --accent-ink:#06211B; --accent-soft:#11302A;
+  --warn:#D6A264; --warn-soft:#31250F;
+  --crit:#E38686; --crit-soft:#351B1B;
+  --good:#3FBFA0; --good-soft:#11302A;
+  --schema:#C295E2; --schema-soft:#271937; --schema-line:#4A3260;
+  --shadow:0 1px 2px rgba(0,0,0,.4), 0 4px 14px rgba(0,0,0,.28);
+}
+
+*{box-sizing:border-box}
+body{
+  margin:0; background:var(--paper); color:var(--ink);
+  font-family:"IBM Plex Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+  font-size:var(--fs-body); line-height:1.5;
+  -webkit-font-smoothing:antialiased;
+}
+h1,h2,h3{font-family:"Bricolage Grotesque","IBM Plex Sans",sans-serif;margin:0;text-wrap:balance;letter-spacing:-.015em}
+p{margin:0}
+button{font:inherit;color:inherit}
+input,select,textarea{font:inherit}
+
+.wrap{max-width:1180px;margin:0 auto;padding-inline:16px}
+
+/* ---------- top bar ---------- */
+.topbar{
+  position:sticky; top:env(safe-area-inset-top,0px); z-index:40;
+  background:color-mix(in srgb,var(--paper) 88%, transparent);
+  backdrop-filter:blur(10px); border-bottom:1px solid var(--line);
+}
+.topbar-in{display:flex;align-items:center;gap:16px;flex-wrap:wrap;padding-block:12px}
+.brand{display:flex;flex-direction:column;gap:1px;margin-right:auto}
+.brand b{font-family:"Bricolage Grotesque",sans-serif;font-size:1.02rem;font-weight:800;letter-spacing:-.02em}
+.brand span{font-size:var(--fs-xs);color:var(--ink-3)}
+
+.switch{display:flex;align-items:center;gap:9px;cursor:pointer;user-select:none;
+  border:1px solid var(--schema-line);background:var(--schema-soft);
+  padding:7px 12px 7px 10px;border-radius:999px}
+.switch:focus-within{outline:2px solid var(--schema);outline-offset:2px}
+.switch input{position:absolute;opacity:0;width:0;height:0}
+.track{width:32px;height:18px;border-radius:999px;background:var(--line-2);position:relative;transition:background .18s;flex:none}
+.track::after{content:"";position:absolute;top:2px;left:2px;width:14px;height:14px;border-radius:50%;
+  background:var(--surface);transition:transform .18s;box-shadow:0 1px 2px rgba(0,0,0,.25)}
+.switch input:checked + .track{background:var(--schema)}
+.switch input:checked + .track::after{transform:translateX(14px)}
+.switch .lbl{font-size:var(--fs-sm);font-weight:600;color:var(--schema);white-space:nowrap}
+
+/* ---------- tabs ---------- */
+.tabs{display:flex;gap:2px;overflow-x:auto;padding-block:0 0;scrollbar-width:none}
+.tabs::-webkit-scrollbar{display:none}
+.tab{
+  border:none;background:none;cursor:pointer;white-space:nowrap;
+  padding:11px 13px;font-size:var(--fs-sm);font-weight:600;color:var(--ink-3);
+  border-bottom:2px solid transparent;
+}
+.tab:hover{color:var(--ink-2)}
+.tab[aria-selected="true"]{color:var(--accent);border-bottom-color:var(--accent)}
+.tab em{font-style:normal;color:var(--ink-3);font-weight:500}
+.tab[aria-selected="true"] em{color:var(--accent)}
+
+/* ---------- schema labels ---------- */
+.f{display:none}
+body.schema-on .f{
+  display:inline-block; font-family:"IBM Plex Mono",ui-monospace,monospace;
+  font-size:.635rem; font-weight:500; line-height:1.35;
+  color:var(--schema); background:var(--schema-soft);
+  border:1px solid var(--schema-line); border-radius:4px;
+  padding:0 4px; margin:2px 0 2px 5px; vertical-align:middle;
+  white-space:nowrap;
+}
+body.schema-on .f.blk{display:block;margin:4px 0 0 0;width:fit-content}
+body.schema-on [data-tbl]{outline:1px dashed var(--schema-line);outline-offset:3px;border-radius:4px}
+.tbl-tag{display:none}
+body.schema-on .tbl-tag{
+  display:inline-flex;align-items:center;gap:5px;
+  font-family:"IBM Plex Mono",monospace;font-size:var(--fs-xs);font-weight:600;
+  color:var(--accent-ink);background:var(--schema);border-radius:5px;padding:2px 7px;
+}
+.schema-note{display:none}
+body.schema-on .schema-note{
+  display:block;background:var(--schema-soft);border:1px solid var(--schema-line);
+  border-radius:var(--r);padding:12px 14px;font-size:var(--fs-sm);color:var(--ink-2);
+}
+body.schema-on .schema-note b{color:var(--schema)}
+body.schema-on .schema-note code{font-family:"IBM Plex Mono",monospace;font-size:.78em;
+  background:var(--surface);border:1px solid var(--schema-line);padding:1px 4px;border-radius:3px}
+
+/* ---------- generic ---------- */
+.panel{padding-block:22px 56px}
+.panel[hidden]{display:none}
+.stack{display:flex;flex-direction:column;gap:18px}
+.eyebrow{font-size:var(--fs-xs);font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--ink-3)}
+.muted{color:var(--ink-2)}
+.tiny{font-size:var(--fs-xs);color:var(--ink-3)}
+
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r)}
+.pad{padding:16px}
+
+.pill{display:inline-flex;align-items:center;gap:5px;font-size:var(--fs-xs);font-weight:600;
+  padding:3px 8px;border-radius:999px;border:1px solid transparent;white-space:nowrap}
+.pill.ok{background:var(--good-soft);color:var(--good)}
+.pill.warn{background:var(--warn-soft);color:var(--warn)}
+.pill.crit{background:var(--crit-soft);color:var(--crit)}
+.pill.flat{background:var(--surface-2);color:var(--ink-2);border-color:var(--line)}
+
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;
+  border:1px solid var(--line-2);background:var(--surface);border-radius:8px;
+  padding:9px 14px;font-size:var(--fs-sm);font-weight:600;cursor:pointer}
+.btn:hover{border-color:var(--ink-3)}
+.btn.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.btn.primary:hover{filter:brightness(1.08)}
+.btn:focus-visible,.tab:focus-visible,.chip:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+
+.chip{border:1px solid var(--line-2);background:var(--surface);color:var(--ink-2);
+  border-radius:999px;padding:5px 11px;font-size:var(--fs-sm);font-weight:500;cursor:pointer}
+.chip:hover{border-color:var(--ink-3)}
+.chip[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--accent-ink);font-weight:600}
+.chiprow{display:flex;flex-wrap:wrap;gap:6px}
+
+label.field{display:flex;flex-direction:column;gap:5px;font-size:var(--fs-sm);font-weight:600}
+label.field > input, label.field > select{
+  border:1px solid var(--line-2);background:var(--surface);color:var(--ink);
+  border-radius:8px;padding:9px 10px;font-weight:400;font-size:var(--fs-body);width:100%}
+label.field > input:focus, label.field > select:focus{outline:2px solid var(--accent);outline-offset:-1px;border-color:var(--accent)}
+
+/* ---------- search layout ---------- */
+.search-grid{display:grid;grid-template-columns:238px 1fr;gap:18px;align-items:start}
+@media (max-width:780px){.search-grid{grid-template-columns:1fr}}
+.filters{position:sticky;top:calc(env(safe-area-inset-top,0px) + 108px)}
+@media (max-width:780px){.filters{position:static}}
+.fgroup{display:flex;flex-direction:column;gap:8px;padding-block:13px;border-bottom:1px solid var(--line)}
+.fgroup:last-child{border-bottom:none}
+.fgroup > .eyebrow{display:flex;flex-wrap:wrap;align-items:center}
+
+.results-head{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin-bottom:12px}
+.results-head h2{font-size:var(--fs-h2)}
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(268px,1fr));gap:14px}
+
+.lcard{display:flex;flex-direction:column;overflow:hidden;background:var(--surface);
+  border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow)}
+.lcard .thumb{aspect-ratio:16/10;max-width:100%;background:var(--surface-2);
+  display:flex;align-items:flex-end;padding:9px;gap:6px;flex-wrap:wrap;
+  background-image:linear-gradient(135deg,var(--surface-3) 0%,var(--surface-2) 55%,var(--surface-3) 100%)}
+.lcard .body{padding:13px;display:flex;flex-direction:column;gap:7px;flex:1}
+.lcard h3{font-size:.97rem;font-weight:700}
+.lcard .loc{font-size:var(--fs-sm);color:var(--ink-2)}
+.lcard .price{font-family:"Bricolage Grotesque",sans-serif;font-size:1.12rem;font-weight:800;letter-spacing:-.02em}
+.lcard .spec{display:flex;flex-wrap:wrap;gap:4px 12px;font-size:var(--fs-sm);color:var(--ink-2);
+  font-variant-numeric:tabular-nums}
+.lcard .rera{margin-top:auto;padding-top:9px;border-top:1px solid var(--line);
+  font-family:"IBM Plex Mono",monospace;font-size:var(--fs-xs);color:var(--ink-2);
+  display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+
+.empty{padding:34px 18px;text-align:center;color:var(--ink-3);border:1px dashed var(--line-2);border-radius:var(--r)}
+
+/* ---------- project detail ---------- */
+.detail{display:grid;grid-template-columns:1fr 310px;gap:20px;align-items:start}
+@media (max-width:860px){.detail{grid-template-columns:1fr}}
+.hero{aspect-ratio:16/7;max-width:100%;border-radius:var(--r);background:var(--surface-2);
+  background-image:linear-gradient(120deg,var(--surface-3),var(--surface-2) 60%,var(--surface-3));
+  border:1px solid var(--line);display:flex;align-items:flex-end;padding:12px;gap:7px;flex-wrap:wrap}
+.rera-bar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;
+  background:var(--warn-soft);border:1px solid var(--warn);border-radius:8px;padding:10px 13px}
+.rera-bar .num{font-family:"IBM Plex Mono",monospace;font-weight:600;font-size:.86rem;color:var(--warn)}
+.specgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(128px,1fr));gap:1px;
+  background:var(--line);border:1px solid var(--line);border-radius:var(--r);overflow:hidden}
+.specgrid > div{background:var(--surface);padding:11px 13px;display:flex;flex-direction:column;gap:2px}
+.specgrid dt{font-size:var(--fs-xs);color:var(--ink-3);text-transform:uppercase;letter-spacing:.05em;font-weight:600}
+.specgrid dd{margin:0;font-weight:600;font-variant-numeric:tabular-nums}
+
+.tablewrap{overflow-x:auto;border:1px solid var(--line);border-radius:var(--r);background:var(--surface)}
+table{border-collapse:collapse;width:100%;font-size:var(--fs-sm);min-width:520px}
+th,td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--line);white-space:nowrap}
+th{font-size:var(--fs-xs);text-transform:uppercase;letter-spacing:.05em;color:var(--ink-3);
+  background:var(--surface-2);font-weight:600;position:sticky;top:0}
+tbody tr:last-child td{border-bottom:none}
+td.num{font-variant-numeric:tabular-nums;font-weight:600}
+
+.private{border:1px solid var(--crit);background:var(--crit-soft);border-radius:var(--r);padding:13px}
+.private .eyebrow{color:var(--crit)}
+
+.aside{display:flex;flex-direction:column;gap:12px;position:sticky;
+  top:calc(env(safe-area-inset-top,0px) + 108px)}
+@media (max-width:860px){.aside{position:static}}
+.wa{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;
+  background:#128C7E;color:#fff;border:none;border-radius:8px;padding:11px;font-weight:700;
+  font-size:var(--fs-sm);cursor:pointer;text-decoration:none}
+.wa:hover{filter:brightness(1.08)}
+.url-preview{font-family:"IBM Plex Mono",monospace;font-size:.66rem;color:var(--ink-2);
+  background:var(--surface-2);border:1px solid var(--line);border-radius:6px;padding:8px;
+  word-break:break-all;line-height:1.5}
+
+/* ---------- enquiry form ---------- */
+.form-grid{display:grid;grid-template-columns:1fr 400px;gap:20px;align-items:start}
+@media (max-width:900px){.form-grid{grid-template-columns:1fr}}
+.steps{display:flex;gap:6px;margin-bottom:16px;flex-wrap:wrap}
+.step{flex:1;min-width:92px;border-top:3px solid var(--line-2);padding-top:7px;
+  font-size:var(--fs-xs);font-weight:600;color:var(--ink-3)}
+.step.on{border-top-color:var(--accent);color:var(--accent)}
+.step.done{border-top-color:var(--accent);color:var(--ink-2)}
+.fieldset{display:flex;flex-direction:column;gap:15px}
+.fieldset[hidden]{display:none}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media (max-width:520px){.two{grid-template-columns:1fr}}
+.consent{display:flex;gap:10px;align-items:flex-start;background:var(--surface-2);
+  border:1px solid var(--line);border-radius:8px;padding:12px}
+.consent input{margin-top:3px;width:16px;height:16px;flex:none;accent-color:var(--accent)}
+.consent label{font-size:var(--fs-sm);color:var(--ink-2);line-height:1.5}
+.navrow{display:flex;gap:10px;justify-content:space-between;align-items:center;flex-wrap:wrap}
+
+.sqlbox{background:#12181C;border:1px solid var(--line-2);border-radius:var(--r);overflow:hidden}
+:root[data-theme="light"] .sqlbox, :root:not([data-theme="dark"]) .sqlbox{background:#141B1F}
+.sqlbox header{display:flex;align-items:center;justify-content:space-between;gap:8px;
+  padding:9px 12px;background:rgba(255,255,255,.055);border-bottom:1px solid rgba(255,255,255,.1)}
+.sqlbox header span{font-family:"IBM Plex Mono",monospace;font-size:var(--fs-xs);
+  color:#8FA8A0;font-weight:600;letter-spacing:.03em}
+.sqlbox pre{margin:0;padding:13px;overflow-x:auto;font-family:"IBM Plex Mono",monospace;
+  font-size:.705rem;line-height:1.75;color:#CFE0DA;white-space:pre}
+.sqlbox .k{color:#7FD1B9}.sqlbox .s{color:#E6C48A}.sqlbox .n{color:#9FC4E8}
+.sqlbox .c{color:#5E7770;font-style:italic}.sqlbox .nul{color:#C48FBE}
+
+.success{border:1px solid var(--accent);background:var(--accent-soft);border-radius:var(--r);padding:18px}
+
+/* ---------- admin ---------- */
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px}
+.kpi{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:13px 15px;
+  display:flex;flex-direction:column;gap:3px}
+.kpi b{font-family:"Bricolage Grotesque",sans-serif;font-size:1.5rem;font-weight:800;
+  letter-spacing:-.025em;font-variant-numeric:tabular-nums}
+.kpi span{font-size:var(--fs-xs);color:var(--ink-3);text-transform:uppercase;letter-spacing:.05em;font-weight:600}
+
+.scorebar{display:inline-flex;align-items:center;gap:7px}
+.scorebar .bar{width:46px;height:5px;border-radius:3px;background:var(--surface-3);overflow:hidden;flex:none}
+.scorebar .fill{height:100%;border-radius:3px;background:var(--accent)}
+.scorebar .fill.hot{background:var(--crit)}
+.scorebar b{font-variant-numeric:tabular-nums;min-width:22px;font-size:var(--fs-sm)}
+
+tr.lead{cursor:pointer}
+tr.lead:hover td{background:var(--surface-2)}
+tr.lead[aria-expanded="true"] td{background:var(--accent-soft)}
+tr.detailrow > td{padding:0;white-space:normal;background:var(--surface-2)}
+.leaddetail{padding:15px;display:grid;grid-template-columns:repeat(auto-fit,minmax(215px,1fr));gap:16px}
+.leaddetail h4{margin:0 0 7px;font-size:var(--fs-xs);text-transform:uppercase;letter-spacing:.06em;
+  color:var(--ink-3);font-family:"IBM Plex Sans",sans-serif;font-weight:700}
+.kv{display:flex;flex-direction:column;gap:4px;font-size:var(--fs-sm)}
+.kv > div{display:flex;gap:7px;justify-content:space-between;align-items:baseline;flex-wrap:wrap}
+.kv span:first-child{color:var(--ink-3)}
+.kv span:last-child{font-weight:600;text-align:right}
+.timeline{display:flex;flex-direction:column;gap:8px;font-size:var(--fs-sm)}
+.timeline > div{display:flex;gap:9px;align-items:flex-start}
+.timeline .dot{width:7px;height:7px;border-radius:50%;background:var(--accent);margin-top:6px;flex:none}
+.timeline .dot.grey{background:var(--line-2)}
+
+.footnote{border-top:1px solid var(--line);padding-block:18px 8px;font-size:var(--fs-xs);color:var(--ink-3);
+  display:flex;flex-direction:column;gap:6px}
+
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+
+<div class="topbar">
+  <div class="wrap">
+    <div class="topbar-in">
+      <div class="brand">
+        <b>Hyderabad Property Console</b>
+        <span>Interface prototype &middot; sample data, not real listings</span>
+      </div>
+      <label class="switch" for="schemaToggle">
+        <input type="checkbox" id="schemaToggle">
+        <span class="track"></span>
+        <span class="lbl">Show database fields</span>
+      </label>
+    </div>
+    <div class="tabs" role="tablist">
+      <button class="tab" role="tab" id="t-search"  aria-selected="true"  aria-controls="p-search">Buyer <em>&rsaquo;</em> Search</button>
+      <button class="tab" role="tab" id="t-project" aria-selected="false" aria-controls="p-project">Buyer <em>&rsaquo;</em> Project page</button>
+      <button class="tab" role="tab" id="t-enquiry" aria-selected="false" aria-controls="p-enquiry">Buyer <em>&rsaquo;</em> Enquiry</button>
+      <button class="tab" role="tab" id="t-admin"   aria-selected="false" aria-controls="p-admin">Admin <em>&rsaquo;</em> Leads</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ SEARCH ============ -->
+<section class="panel wrap" id="p-search" role="tabpanel" aria-labelledby="t-search">
+  <div class="stack">
+    <div class="schema-note">
+      <b>Database field mode is on.</b> Every purple tag is the exact <code>table.column</code> that fills
+      the element beside it. The dashed outlines group elements that come from one table row.
+      This screen reads from <code>listings</code> joined to <code>projects</code> and <code>localities</code>.
+    </div>
+
+    <div class="search-grid">
+      <aside class="filters card pad" data-tbl>
+        <span class="tbl-tag">filters → SQL where-clause</span>
+
+        <div class="fgroup">
+          <span class="eyebrow">Locality <span class="f">localities.id</span></span>
+          <div class="chiprow" id="fLocality"></div>
+        </div>
+
+        <div class="fgroup">
+          <span class="eyebrow">Bedrooms <span class="f">listings.bedrooms</span></span>
+          <div class="chiprow" id="fBhk"></div>
+        </div>
+
+        <div class="fgroup">
+          <span class="eyebrow">Budget <span class="f">listings.price_min / price_max</span></span>
+          <label class="field" style="font-weight:500">
+            <select id="fBudget">
+              <option value="0">Any budget</option>
+              <option value="1">Under ₹75 L</option>
+              <option value="2">₹75 L – ₹1.2 Cr</option>
+              <option value="3">₹1.2 Cr – ₹2 Cr</option>
+              <option value="4">Above ₹2 Cr</option>
+            </select>
+          </label>
+        </div>
+
+        <div class="fgroup">
+          <span class="eyebrow">Property type <span class="f">projects.property_type</span></span>
+          <div class="chiprow" id="fType"></div>
+        </div>
+
+        <div class="fgroup">
+          <span class="eyebrow">Status <span class="f">projects.construction_status</span></span>
+          <div class="chiprow" id="fStatus"></div>
+        </div>
+
+        <div class="fgroup">
+          <span class="eyebrow">Sale type <span class="f">listings.kind</span></span>
+          <div class="chiprow" id="fKind"></div>
+        </div>
+
+        <div class="fgroup">
+          <button class="btn" id="clearFilters" style="width:100%">Clear all filters</button>
+        </div>
+      </aside>
+
+      <div>
+        <div class="results-head">
+          <h2 id="resultCount">6 properties</h2>
+          <span class="tiny" id="resultNote">across 6 projects in Hyderabad</span>
+        </div>
+        <div class="cards" id="results"></div>
+        <div class="empty" id="noResults" hidden>
+          No properties match these filters. Try widening the budget or clearing a locality.
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ PROJECT DETAIL ============ -->
+<section class="panel wrap" id="p-project" role="tabpanel" aria-labelledby="t-project" hidden>
+  <div class="stack">
+    <div class="schema-note">
+      <b>One <code>projects</code> row, plus its <code>listings</code> children.</b>
+      Note the red block near the bottom: <code>internal_pros</code>, <code>internal_cons</code> and
+      <code>owner_phone</code> exist in the same tables but must never be rendered on a public page.
+      Seeing them side by side is the point — that is the mistake to design against.
+    </div>
+
+    <div class="detail">
+      <div class="stack">
+        <div>
+          <span class="eyebrow">Kokapet, West Hyderabad <span class="f">localities.name / localities.zone</span></span>
+          <h1 style="font-size:var(--fs-display);margin-top:4px">Aranya Skyline
+            <span class="f">projects.name</span></h1>
+          <p class="muted" style="margin-top:5px">By Suvarna Estates
+            <span class="f">builders.name</span></p>
+        </div>
+
+        <div class="hero" aria-hidden="true">
+          <span class="pill flat">Photo 1 of 14 <span class="f">media.url</span></span>
+        </div>
+
+        <div class="rera-bar">
+          <span class="pill warn">TG-RERA</span>
+          <span class="num">P02400004417</span>
+          <span class="f">projects.rera_number</span>
+          <span class="tiny">Valid to 31 Dec 2028 <span class="f">projects.rera_valid_until</span></span>
+        </div>
+        <p class="tiny">Legally required on every advertisement, print or digital. A project row without
+          this number should never be publishable.</p>
+
+        <dl class="specgrid" data-tbl>
+          <div><dt>Status</dt><dd>Under construction</dd><span class="f blk">construction_status</span></div>
+          <div><dt>Possession</dt><dd>Dec 2027</dd><span class="f blk">possession_date</span></div>
+          <div><dt>Towers</dt><dd>4</dd><span class="f blk">total_towers</span></div>
+          <div><dt>Units</dt><dd>612</dd><span class="f blk">total_units</span></div>
+          <div><dt>Land area</dt><dd>6.4 acres</dd><span class="f blk">land_area_acres</span></div>
+          <div><dt>Open space</dt><dd>72%</dd><span class="f blk">open_space_percent</span></div>
+        </dl>
+
+        <div>
+          <span class="eyebrow">Available configurations <span class="f">listings — one row each</span></span>
+          <div class="tablewrap" style="margin-top:9px">
+            <table>
+              <thead>
+                <tr>
+                  <th>Configuration<span class="f">title</span></th>
+                  <th>Saleable<span class="f">saleable_area_sqft</span></th>
+                  <th>Facing<span class="f">facing</span></th>
+                  <th>Price<span class="f">price_min–max</span></th>
+                  <th>Available<span class="f">units_available</span></th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><td>2 BHK Type A</td><td class="num">1,285 sqft</td><td>East</td><td class="num">₹92 L</td><td class="num">14</td></tr>
+                <tr><td>3 BHK Type B</td><td class="num">1,740 sqft</td><td>North-east</td><td class="num">₹1.24 Cr</td><td class="num">31</td></tr>
+                <tr><td>3 BHK Type C</td><td class="num">1,905 sqft</td><td>West</td><td class="num">₹1.36 Cr</td><td class="num">8</td></tr>
+                <tr><td>4 BHK Corner</td><td class="num">2,640 sqft</td><td>North-east</td><td class="num">₹1.95 Cr</td><td class="num">3</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="card pad">
+          <span class="eyebrow">Amenities <span class="f">projects.amenities — text[]</span></span>
+          <div class="chiprow" style="margin-top:9px">
+            <span class="pill flat">Clubhouse</span><span class="pill flat">Swimming pool</span>
+            <span class="pill flat">Gym</span><span class="pill flat">Children's play area</span>
+            <span class="pill flat">Jogging track</span><span class="pill flat">Power backup</span>
+            <span class="pill flat">Rainwater harvesting</span>
+          </div>
+          <p class="tiny" style="margin-top:10px">Stored as an array so a filter is one query:
+            <code style="font-family:'IBM Plex Mono',monospace">where amenities @&gt; array['clubhouse']</code></p>
+        </div>
+
+        <div class="private" data-tbl>
+          <span class="eyebrow">Never rendered publicly — staff only</span>
+          <div style="display:grid;gap:11px;margin-top:10px">
+            <div>
+              <b style="font-size:var(--fs-sm)">Your honest view <span class="f">projects.internal_pros / internal_cons</span></b>
+              <p class="tiny" style="margin-top:3px;color:var(--ink-2)">Good: genuine 72% open space, ORR access in 4 min.
+                Bad: no school within 3 km, handover history on the builder's last project slipped 9 months.</p>
+            </div>
+            <div>
+              <b style="font-size:var(--fs-sm)">Resale unit owner <span class="f">listings.owner_name / owner_phone</span></b>
+              <p class="tiny" style="margin-top:3px;color:var(--ink-2)">Tower B-1104 · owner contact on file · asking ₹1.31 Cr, flexible</p>
+            </div>
+          </div>
+          <p class="tiny" style="margin-top:11px;color:var(--crit);font-weight:600">
+            Known gap in schema v1: these owner columns sit on the public-readable
+            <code style="font-family:'IBM Plex Mono',monospace">listings</code> table.
+            Move them to a separate table before listing a real resale property.</p>
+        </div>
+      </div>
+
+      <aside class="aside">
+        <div class="card pad" style="display:flex;flex-direction:column;gap:11px">
+          <div>
+            <span class="eyebrow">Starting from</span>
+            <div style="font-family:'Bricolage Grotesque',sans-serif;font-size:1.65rem;font-weight:800;letter-spacing:-.025em">₹92 L</div>
+            <span class="tiny">₹7,160 / sqft <span class="f">price_per_sqft</span></span>
+          </div>
+          <button class="btn primary" style="width:100%" id="goEnquiry">Check availability</button>
+          <a class="wa" href="#" id="waLink">Ask on WhatsApp</a>
+          <div class="f blk" style="margin-left:0">wa.me link — no API, no cost</div>
+          <div class="url-preview" id="waPreview"></div>
+        </div>
+
+        <div class="card pad">
+          <span class="eyebrow">Tracked silently <span class="f">listing_views</span></span>
+          <div class="kv" style="margin-top:9px">
+            <div><span>session_id</span><span id="sessDemo">a7f3c9e2…</span></div>
+            <div><span>project_id</span><span>Aranya Skyline</span></div>
+            <div><span>seconds_on_page</span><span id="secOnPage">0s</span></div>
+            <div><span>lead_id</span><span style="color:var(--ink-3);font-weight:400">null — until they enquire</span></div>
+          </div>
+          <p class="tiny" style="margin-top:10px">When this visitor later submits their number,
+            <code style="font-family:'IBM Plex Mono',monospace">submit_enquiry()</code> backfills
+            <code style="font-family:'IBM Plex Mono',monospace">lead_id</code> across every row from this
+            session — so you inherit their whole browsing history retroactively.</p>
+        </div>
+      </aside>
+    </div>
+  </div>
+</section>
+
+<!-- ============ ENQUIRY ============ -->
+<section class="panel wrap" id="p-enquiry" role="tabpanel" aria-labelledby="t-enquiry" hidden>
+  <div class="stack">
+    <div class="schema-note">
+      <b>Watch the panel on the right as you fill this in.</b> It writes itself into the exact
+      <code>submit_enquiry()</code> call your site will make. Three screens of questions become
+      one row in <code>leads</code>, one row in <code>lead_requirements</code>, and one row in
+      <code>lead_listing_interest</code> — atomically, in one function.
+    </div>
+
+    <div class="form-grid">
+      <div class="card pad">
+        <div class="steps">
+          <div class="step on"  id="s1">1 &middot; What you want</div>
+          <div class="step"     id="s2">2 &middot; Where</div>
+          <div class="step"     id="s3">3 &middot; Who you are</div>
+        </div>
+
+        <!-- step 1 -->
+        <div class="fieldset" id="fs1">
+          <div>
+            <span class="eyebrow">Property type <span class="f">property_types[]</span></span>
+            <div class="chiprow" id="qType" style="margin-top:7px"></div>
+          </div>
+          <div>
+            <span class="eyebrow">Bedrooms — pick any that work <span class="f">bedrooms_wanted int[]</span></span>
+            <div class="chiprow" id="qBhk" style="margin-top:7px"></div>
+          </div>
+          <div class="two">
+            <label class="field">Budget from <span class="f">budget_min</span>
+              <select id="qBudMin">
+                <option value="">Select</option>
+                <option value="4000000">₹40 L</option><option value="6000000">₹60 L</option>
+                <option value="7500000">₹75 L</option><option value="10000000">₹1 Cr</option>
+                <option value="15000000">₹1.5 Cr</option><option value="20000000">₹2 Cr</option>
+              </select>
+            </label>
+            <label class="field">Budget to <span class="f">budget_max</span>
+              <select id="qBudMax">
+                <option value="">Select</option>
+                <option value="6000000">₹60 L</option><option value="7500000">₹75 L</option>
+                <option value="10000000">₹1 Cr</option><option value="12500000">₹1.25 Cr</option>
+                <option value="15000000">₹1.5 Cr</option><option value="20000000">₹2 Cr</option>
+                <option value="30000000">₹3 Cr</option>
+              </select>
+            </label>
+          </div>
+          <div>
+            <span class="eyebrow">This is for <span class="f">purpose — buyer_purpose enum</span></span>
+            <div class="chiprow" id="qPurpose" style="margin-top:7px"></div>
+          </div>
+          <div class="navrow">
+            <span class="tiny">Nothing is saved until the last step.</span>
+            <button class="btn primary" data-go="2">Continue</button>
+          </div>
+        </div>
+
+        <!-- step 2 -->
+        <div class="fieldset" id="fs2" hidden>
+          <div>
+            <span class="eyebrow">Preferred localities <span class="f">preferred_localities int[]</span></span>
+            <div class="chiprow" id="qLoc" style="margin-top:7px"></div>
+          </div>
+          <div class="two">
+            <label class="field">Where do you work? <span class="f">workplace_locality_id</span>
+              <select id="qWork">
+                <option value="">Select</option>
+              </select>
+            </label>
+            <label class="field">Acceptable commute <span class="f">max_commute_minutes</span>
+              <select id="qCommute">
+                <option value="">Select</option>
+                <option value="20">Up to 20 min</option><option value="30">Up to 30 min</option>
+                <option value="45">Up to 45 min</option><option value="60">Up to an hour</option>
+              </select>
+            </label>
+          </div>
+          <p class="tiny">The workplace question is the one most portals never ask. In Hyderabad it
+            predicts locality choice better than budget does — and people answer it willingly,
+            because it makes your suggestions obviously better.</p>
+          <div>
+            <span class="eyebrow">Home loan <span class="f">loan_required / loan_pre_approved</span></span>
+            <div class="chiprow" id="qLoan" style="margin-top:7px"></div>
+          </div>
+          <div class="navrow">
+            <button class="btn" data-go="1">Back</button>
+            <button class="btn primary" data-go="3">Continue</button>
+          </div>
+        </div>
+
+        <!-- step 3 -->
+        <div class="fieldset" id="fs3" hidden>
+          <div class="two">
+            <label class="field">Your name <span class="f">leads.full_name</span>
+              <input type="text" id="qName" placeholder="Full name" autocomplete="name">
+            </label>
+            <label class="field">Mobile <span class="f">leads.phone — unique key</span>
+              <input type="tel" id="qPhone" placeholder="10-digit number" inputmode="numeric" autocomplete="tel">
+            </label>
+          </div>
+          <label class="field">Email — optional <span class="f">leads.email</span>
+            <input type="email" id="qEmail" placeholder="you@example.com" autocomplete="email">
+          </label>
+
+          <div class="consent">
+            <input type="checkbox" id="qConsent">
+            <label for="qConsent">I agree to be contacted about properties matching these
+              requirements by phone, SMS and WhatsApp. I can ask for my data to be deleted at any time.
+              <span class="f">leads.consent_given · consent_at · consent_text</span></label>
+          </div>
+          <p class="tiny">Under DPDP the exact wording agreed to is stored with the timestamp, not just
+            a true/false. If the wording changes later, old consents still show what was actually agreed.</p>
+
+          <div class="navrow">
+            <button class="btn" data-go="2">Back</button>
+            <button class="btn primary" id="qSubmit" disabled>Submit enquiry</button>
+          </div>
+        </div>
+
+        <div id="qDone" hidden>
+          <div class="success">
+            <h3 style="font-size:var(--fs-h2)">Thanks — we'll call you within the hour.</h3>
+            <p class="muted" style="margin-top:7px;font-size:var(--fs-sm)">
+              Meanwhile, here are three projects matching your brief.</p>
+            <button class="btn" id="qReset" style="margin-top:13px">Reset the form</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="stack">
+        <div class="sqlbox">
+          <header>
+            <span>LIVE — what this form will execute</span>
+            <span id="sqlValid">incomplete</span>
+          </header>
+          <pre id="sqlOut"></pre>
+        </div>
+        <div class="card pad">
+          <span class="eyebrow">Why one function, not four inserts</span>
+          <p class="tiny" style="margin-top:8px;line-height:1.65">
+            The public site has no permission to read or write the <code style="font-family:'IBM Plex Mono',monospace">leads</code>
+            table directly — that is deliberate, and it is what stops a stranger downloading your
+            entire lead list. <code style="font-family:'IBM Plex Mono',monospace">submit_enquiry()</code>
+            is a <code style="font-family:'IBM Plex Mono',monospace">security definer</code> function:
+            the one narrow door in. It writes all four rows or none of them.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ ADMIN ============ -->
+<section class="panel wrap" id="p-admin" role="tabpanel" aria-labelledby="t-admin" hidden>
+  <div class="stack">
+    <div class="schema-note">
+      <b>This is the Supabase table editor's job for the first few months.</b> Do not build this screen
+      in v1 — it is drawn here so you can see what the <code>lead_scores</code> view already gives you
+      for free. Click any row to open what you'd have before picking up the phone.
+    </div>
+
+    <div class="kpis">
+      <div class="kpi"><b>47</b><span>Leads this month</span><span class="f">count(leads)</span></div>
+      <div class="kpi"><b>12</b><span>Uncontacted</span><span class="f">status = 'new'</span></div>
+      <div class="kpi"><b>5</b><span>Score above 70</span><span class="f">lead_scores.score</span></div>
+      <div class="kpi"><b>3</b><span>Site visits booked</span><span class="f">lead_activities</span></div>
+    </div>
+
+    <div>
+      <div class="results-head">
+        <h2>Call these first</h2>
+        <span class="tiny">sorted by <code style="font-family:'IBM Plex Mono',monospace">lead_scores.score</code> descending</span>
+      </div>
+      <div class="tablewrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Name<span class="f">full_name</span></th>
+              <th>Score<span class="f">lead_scores.score</span></th>
+              <th>Budget<span class="f">budget_min–max</span></th>
+              <th>Wants<span class="f">bedrooms_wanted</span></th>
+              <th>Localities<span class="f">preferred_localities</span></th>
+              <th>Status<span class="f">leads.status</span></th>
+              <th>Owner<span class="f">leads.owner_id</span></th>
+            </tr>
+          </thead>
+          <tbody id="leadRows"></tbody>
+        </table>
+      </div>
+      <p class="tiny" style="margin-top:10px">Sample data. Scores come from the rule-based
+        <code style="font-family:'IBM Plex Mono',monospace">lead_scores</code> view in the schema —
+        page views, repeat visits, a stated budget, a disclosed workplace, loan status, recency.
+        No machine learning involved, and none needed for the first six months.</p>
+    </div>
+
+    <div class="footnote">
+      <span>Sample project names, prices and RERA numbers throughout are invented for this prototype.
+        Replace every one with verified data before publishing anything.</span>
+    </div>
+  </div>
+</section>
+
+<script>
+/* ---------------- sample data ---------------- */
+const LOCS = [
+  {id:1,name:"Kokapet",zone:"West"},      {id:2,name:"Tellapur",zone:"West"},
+  {id:3,name:"Narsingi",zone:"West"},     {id:4,name:"Gachibowli",zone:"West"},
+  {id:5,name:"Kondapur",zone:"West"},     {id:6,name:"Bachupally",zone:"North"},
+  {id:7,name:"Kompally",zone:"North"},    {id:8,name:"Financial District",zone:"West"},
+  {id:9,name:"Adibatla",zone:"South"},    {id:10,name:"Pocharam",zone:"East"}
+];
+
+const LISTINGS = [
+  {proj:"Aranya Skyline",  builder:"Suvarna Estates", loc:1, type:"apartment", kind:"new_launch",
+   status:"under_construction", bhk:3, area:1740, price:12400000, psf:7126, rera:"P02400004417",
+   facing:"North-east", possession:"Dec 2027", avail:31},
+  {proj:"Deccan Meridian", builder:"Kalpataru Hyd",   loc:8, type:"apartment", kind:"new_launch",
+   status:"nearing_possession", bhk:4, area:2640, price:24500000, psf:9280, rera:"P02400003902",
+   facing:"East", possession:"Jun 2027", avail:6},
+  {proj:"Banyan Courtyard",builder:"Suvarna Estates", loc:2, type:"villa", kind:"new_launch",
+   status:"under_construction", bhk:4, area:3180, price:19800000, psf:6226, rera:"P02400004188",
+   facing:"West", possession:"Mar 2028", avail:11},
+  {proj:"Rock Garden Residences", builder:"Vaastu Nirman", loc:6, type:"apartment", kind:"new_launch",
+   status:"ready_to_move", bhk:2, area:1150, price:6900000, psf:6000, rera:"P02400002741",
+   facing:"North", possession:"Ready", avail:22},
+  {proj:"Charminar View Heights", builder:"Osman Builders", loc:7, type:"apartment", kind:"resale",
+   status:"completed", bhk:3, area:1620, price:9750000, psf:6018, rera:"P02300001156",
+   facing:"South-east", possession:"Ready", avail:1},
+  {proj:"Sarvani Greens",  builder:"Vaastu Nirman",   loc:3, type:"villa", kind:"resale",
+   status:"completed", bhk:3, area:2400, price:16500000, psf:6875, rera:"P02300000884",
+   facing:"East", possession:"Ready", avail:1}
+];
+
+const LEADS = [
+  {name:"Ravi Teja K.",   score:88, bmin:10000000, bmax:15000000, bhk:"3 BHK", locs:"Kokapet, Tellapur",
+   status:"qualified", owner:"You", views:9, days:3, purpose:"End use", work:"Financial District",
+   loan:"Pre-approved", acts:[["Called — 6 min, asked about possession delay","2 days ago",1],
+   ["Viewed Aranya Skyline 4 times","3 days ago",1],["Submitted enquiry form","4 days ago",0]]},
+  {name:"Priyanka S.",    score:74, bmin:7500000, bmax:10000000, bhk:"2, 3 BHK", locs:"Bachupally, Kompally",
+   status:"contacted", owner:"You", views:6, days:2, purpose:"End use", work:"Kondapur",
+   loan:"Needed, not applied", acts:[["Called — no answer","1 day ago",0],
+   ["Returned and viewed Rock Garden twice","2 days ago",1],["Submitted enquiry form","2 days ago",0]]},
+  {name:"Mohammed A.",    score:71, bmin:15000000, bmax:20000000, bhk:"4 BHK", locs:"Financial District",
+   status:"site_visit_scheduled", owner:"Agent 2", views:5, days:2, purpose:"Investment", work:"Gachibowli",
+   loan:"Not needed", acts:[["Site visit booked for Saturday 11am","today",1],
+   ["WhatsApp — asked for floor plans","yesterday",1],["Submitted enquiry form","3 days ago",0]]},
+  {name:"Lakshmi N.",     score:52, bmin:6000000, bmax:7500000, bhk:"2 BHK", locs:"Pocharam, Adibatla",
+   status:"new", owner:"—", views:3, days:1, purpose:"End use", work:"Pocharam",
+   loan:"Needed, not applied", acts:[["Submitted enquiry form","6 hours ago",1]]},
+  {name:"Sandeep R.",     score:34, bmin:null, bmax:null, bhk:"3 BHK", locs:"Narsingi",
+   status:"dormant", owner:"Agent 2", views:2, days:1, purpose:"Unsure", work:"—",
+   loan:"—", acts:[["Called twice — no answer","11 days ago",0],["Submitted enquiry form","14 days ago",0]]}
+];
+
+/* ---------------- helpers ---------------- */
+const $ = s => document.querySelector(s);
+const $$ = s => Array.from(document.querySelectorAll(s));
+const locName = id => (LOCS.find(l => l.id === id) || {}).name || "";
+
+function inr(n){
+  if(n == null) return "Not shared";
+  if(n >= 10000000){ const c = n/10000000; return "₹" + (c % 1 === 0 ? c : c.toFixed(2).replace(/0$/,"")) + " Cr"; }
+  return "₹" + Math.round(n/100000) + " L";
+}
+const LABEL = {
+  under_construction:"Under construction", nearing_possession:"Nearing possession",
+  ready_to_move:"Ready to move", completed:"Completed", pre_launch:"Pre-launch",
+  new_launch:"New launch", resale:"Resale", apartment:"Apartment", villa:"Villa",
+  new:"New", contacted:"Contacted", qualified:"Qualified",
+  site_visit_scheduled:"Visit booked", dormant:"Dormant"
+};
+
+/* ---------------- schema toggle ---------------- */
+$("#schemaToggle").addEventListener("change", e => {
+  document.body.classList.toggle("schema-on", e.target.checked);
+});
+
+/* ---------------- tabs ---------------- */
+const PANELS = ["search","project","enquiry","admin"];
+function showTab(key){
+  PANELS.forEach(k => {
+    $("#t-"+k).setAttribute("aria-selected", String(k === key));
+    $("#p-"+k).hidden = (k !== key);
+  });
+  window.scrollTo({top:0, behavior:"instant"});
+}
+PANELS.forEach(k => $("#t-"+k).addEventListener("click", () => showTab(k)));
+$("#goEnquiry").addEventListener("click", () => showTab("enquiry"));
+
+/* ---------------- search filters ---------------- */
+const state = {loc:new Set(), bhk:new Set(), type:new Set(), status:new Set(), kind:new Set(), budget:"0"};
+
+function chipset(host, items, bucket){
+  host.innerHTML = "";
+  items.forEach(it => {
+    const b = document.createElement("button");
+    b.className = "chip"; b.type = "button";
+    b.textContent = it.label; b.setAttribute("aria-pressed","false");
+    b.addEventListener("click", () => {
+      const on = b.getAttribute("aria-pressed") === "true";
+      b.setAttribute("aria-pressed", String(!on));
+      on ? bucket.delete(it.value) : bucket.add(it.value);
+      renderResults();
+    });
+    host.appendChild(b);
+  });
+}
+chipset($("#fLocality"), LOCS.slice(0,8).map(l => ({label:l.name, value:l.id})), state.loc);
+chipset($("#fBhk"), [2,3,4].map(n => ({label:n+" BHK", value:n})), state.bhk);
+chipset($("#fType"), [{label:"Apartment",value:"apartment"},{label:"Villa",value:"villa"}], state.type);
+chipset($("#fStatus"), [
+  {label:"Under construction",value:"under_construction"},
+  {label:"Nearing possession",value:"nearing_possession"},
+  {label:"Ready to move",value:"ready_to_move"},
+  {label:"Completed",value:"completed"}], state.status);
+chipset($("#fKind"), [{label:"New launch",value:"new_launch"},{label:"Resale",value:"resale"}], state.kind);
+
+$("#fBudget").addEventListener("change", e => { state.budget = e.target.value; renderResults(); });
+$("#clearFilters").addEventListener("click", () => {
+  [state.loc,state.bhk,state.type,state.status,state.kind].forEach(s => s.clear());
+  state.budget = "0"; $("#fBudget").value = "0";
+  $$(".filters .chip").forEach(c => c.setAttribute("aria-pressed","false"));
+  renderResults();
+});
+
+const BUDGETS = {"1":[0,7500000],"2":[7500000,12000000],"3":[12000000,20000000],"4":[20000000,1e12]};
+
+function renderResults(){
+  const rows = LISTINGS.filter(l => {
+    if(state.loc.size && !state.loc.has(l.loc)) return false;
+    if(state.bhk.size && !state.bhk.has(l.bhk)) return false;
+    if(state.type.size && !state.type.has(l.type)) return false;
+    if(state.status.size && !state.status.has(l.status)) return false;
+    if(state.kind.size && !state.kind.has(l.kind)) return false;
+    if(state.budget !== "0"){
+      const [lo,hi] = BUDGETS[state.budget];
+      if(l.price < lo || l.price >= hi) return false;
+    }
+    return true;
+  });
+
+  $("#resultCount").textContent = rows.length + (rows.length === 1 ? " property" : " properties");
+  $("#resultNote").textContent = rows.length
+    ? "matching your filters in Hyderabad"
+    : "";
+  $("#noResults").hidden = rows.length > 0;
+
+  $("#results").innerHTML = rows.map(l => `
+    <article class="lcard" data-tbl>
+      <div class="thumb" aria-hidden="true">
+        <span class="pill flat">${LABEL[l.kind]}<span class="f">listings.kind</span></span>
+      </div>
+      <div class="body">
+        <h3>${l.proj}<span class="f">projects.name</span></h3>
+        <div class="loc">${locName(l.loc)}<span class="f">localities.name</span></div>
+        <div class="price">${inr(l.price)}<span class="f">listings.price_min</span></div>
+        <div class="spec">
+          <span>${l.bhk} BHK<span class="f">bedrooms</span></span>
+          <span>${l.area.toLocaleString("en-IN")} sqft<span class="f">saleable_area_sqft</span></span>
+          <span>${l.facing}<span class="f">facing</span></span>
+        </div>
+        <div class="spec">
+          <span class="pill ${l.status === "ready_to_move" || l.status === "completed" ? "ok" : "flat"}">
+            ${LABEL[l.status]}<span class="f">construction_status</span></span>
+        </div>
+        <div class="rera">
+          <span class="pill warn">RERA</span>${l.rera}<span class="f">projects.rera_number</span>
+        </div>
+      </div>
+    </article>`).join("");
+}
+renderResults();
+
+/* ---------------- project page bits ---------------- */
+const SESSION = "a7f3c9e2" + Math.random().toString(16).slice(2,6);
+$("#sessDemo").textContent = SESSION.slice(0,8) + "…";
+let secs = 0;
+setInterval(() => {
+  if(!$("#p-project").hidden){ secs++; $("#secOnPage").textContent = secs + "s"; }
+}, 1000);
+
+const waText = encodeURIComponent(
+  "Hi, I'm interested in Aranya Skyline (3 BHK, Kokapet). Could you share the price list and availability?");
+const waURL = "https://wa.me/919000000000?text=" + waText;
+$("#waLink").href = waURL;
+$("#waPreview").textContent = waURL;
+
+/* ---------------- enquiry form ---------------- */
+const q = {types:new Set(), bhk:new Set(), locs:new Set(), purpose:null, loan:null,
+           budMin:"", budMax:"", work:"", commute:"", name:"", phone:"", email:"", consent:false};
+
+function pickset(host, items, bucket, single){
+  host.innerHTML = "";
+  items.forEach(it => {
+    const b = document.createElement("button");
+    b.className = "chip"; b.type = "button"; b.textContent = it.label;
+    b.setAttribute("aria-pressed","false");
+    b.addEventListener("click", () => {
+      if(single){
+        Array.from(host.children).forEach(c => c.setAttribute("aria-pressed","false"));
+        b.setAttribute("aria-pressed","true");
+        q[single] = it.value;
+      } else {
+        const on = b.getAttribute("aria-pressed") === "true";
+        b.setAttribute("aria-pressed", String(!on));
+        on ? bucket.delete(it.value) : bucket.add(it.value);
+      }
+      renderSQL();
+    });
+    host.appendChild(b);
+  });
+}
+pickset($("#qType"), [{label:"Apartment",value:"apartment"},{label:"Villa",value:"villa"},
+  {label:"Plot",value:"plot"}], q.types);
+pickset($("#qBhk"), [2,3,4].map(n => ({label:n+" BHK", value:n})), q.bhk);
+pickset($("#qPurpose"), [{label:"To live in",value:"end_use"},{label:"Investment",value:"investment"},
+  {label:"Not sure yet",value:"unsure"}], null, "purpose");
+pickset($("#qLoc"), LOCS.slice(0,8).map(l => ({label:l.name, value:l.id})), q.locs);
+pickset($("#qLoan"), [{label:"No loan needed",value:"none"},{label:"Will need a loan",value:"need"},
+  {label:"Already pre-approved",value:"approved"}], null, "loan");
+
+const workSel = $("#qWork");
+LOCS.forEach(l => { const o = document.createElement("option"); o.value = l.id; o.textContent = l.name; workSel.appendChild(o); });
+
+["qBudMin","qBudMax","qWork","qCommute","qName","qPhone","qEmail"].forEach(id => {
+  $("#"+id).addEventListener("input", e => {
+    q[id.replace("q","").replace("Bud","bud").replace(/^./, c => c.toLowerCase())] = e.target.value;
+    q.budMin = $("#qBudMin").value; q.budMax = $("#qBudMax").value;
+    q.work = $("#qWork").value; q.commute = $("#qCommute").value;
+    q.name = $("#qName").value; q.phone = $("#qPhone").value; q.email = $("#qEmail").value;
+    renderSQL(); checkSubmit();
+  });
+});
+$("#qConsent").addEventListener("change", e => { q.consent = e.target.checked; renderSQL(); checkSubmit(); });
+
+function checkSubmit(){
+  const ok = q.name.trim().length > 1 && /^[6-9]\d{9}$/.test(q.phone.replace(/\D/g,"")) && q.consent;
+  $("#qSubmit").disabled = !ok;
+}
+
+$$("[data-go]").forEach(b => b.addEventListener("click", () => {
+  const n = b.dataset.go;
+  ["1","2","3"].forEach(i => { $("#fs"+i).hidden = (i !== n); });
+  ["1","2","3"].forEach(i => {
+    const el = $("#s"+i);
+    el.classList.toggle("on", i === n);
+    el.classList.toggle("done", Number(i) < Number(n));
+  });
+}));
+
+function esc(v){ return v == null || v === "" ? '<span class="nul">null</span>' : '<span class="s">\''+v+'\'</span>'; }
+function num(v){ return v == null || v === "" ? '<span class="nul">null</span>' : '<span class="n">'+v+'</span>'; }
+function arr(set){
+  if(!set.size) return '<span class="nul">null</span>';
+  const vals = Array.from(set).map(v => typeof v === "number" ? v : "'"+v+"'").join(",");
+  return '<span class="s">\'{'+vals+'}\'</span>';
+}
+
+function renderSQL(){
+  const ready = !$("#qSubmit").disabled;
+  $("#sqlValid").textContent = ready ? "ready to submit" : "incomplete";
+  $("#sqlValid").style.color = ready ? "#7FD1B9" : "#8FA8A0";
+
+  $("#sqlOut").innerHTML =
+`<span class="k">select</span> submit_enquiry(
+  p_name         =&gt; ${esc(q.name.trim())},
+  p_phone        =&gt; ${esc(q.phone ? "+91"+q.phone.replace(/\D/g,"") : "")},
+  p_email        =&gt; ${esc(q.email.trim())},
+  p_session_id   =&gt; <span class="s">'${SESSION}'</span>,
+  p_listing_id   =&gt; <span class="s">'8f2a…4417'</span>,   <span class="c">-- the unit they were viewing</span>
+  p_consent      =&gt; <span class="k">${q.consent}</span>,
+  p_consent_text =&gt; <span class="s">'I agree to be contacted…'</span>,
+  p_source       =&gt; <span class="s">'organic'</span>,
+  p_budget_min   =&gt; ${num(q.budMin)},
+  p_budget_max   =&gt; ${num(q.budMax)},
+  p_bedrooms     =&gt; ${arr(q.bhk)},
+  p_localities   =&gt; ${arr(q.locs)},
+  p_purpose      =&gt; ${esc(q.purpose)},
+  p_notes        =&gt; <span class="nul">null</span>
+);
+
+<span class="c">-- writes, atomically:
+--   leads                  1 row  (or updates on phone)
+--   lead_requirements      1 row  (append-only — never updated)
+--   lead_listing_interest  1 row  (type = 'enquired')
+--   listing_views          backfills lead_id for session ${SESSION.slice(0,8)}…</span>`;
+}
+renderSQL();
+
+$("#qSubmit").addEventListener("click", () => {
+  ["1","2","3"].forEach(i => $("#fs"+i).hidden = true);
+  $(".steps").hidden = true;
+  $("#qDone").hidden = false;
+});
+$("#qReset").addEventListener("click", () => {
+  $("#qDone").hidden = true; $(".steps").hidden = false;
+  $("#fs1").hidden = false;
+  ["1","2","3"].forEach(i => { const el = $("#s"+i);
+    el.classList.toggle("on", i === "1"); el.classList.remove("done"); });
+});
+
+/* ---------------- admin table ---------------- */
+$("#leadRows").innerHTML = LEADS.map((l,i) => `
+  <tr class="lead" data-i="${i}" aria-expanded="false">
+    <td><b>${l.name}</b></td>
+    <td><span class="scorebar"><span class="bar"><span class="fill ${l.score>70?"hot":""}"
+        style="width:${l.score}%"></span></span><b>${l.score}</b></span></td>
+    <td class="num">${l.bmin ? inr(l.bmin)+" – "+inr(l.bmax) : "<span style='opacity:.5;font-weight:400'>not shared</span>"}</td>
+    <td>${l.bhk}</td>
+    <td>${l.locs}</td>
+    <td><span class="pill ${l.status==="qualified"||l.status==="site_visit_scheduled"?"ok":
+        l.status==="dormant"?"crit":"flat"}">${LABEL[l.status]||l.status}</span></td>
+    <td>${l.owner}</td>
+  </tr>
+  <tr class="detailrow" id="d${i}" hidden><td colspan="7">
+    <div class="leaddetail">
+      <div>
+        <h4>Why this score</h4>
+        <div class="kv">
+          <div><span>Pages viewed</span><span>${l.views}</span></div>
+          <div><span>Distinct days</span><span>${l.days}</span></div>
+          <div><span>Budget stated</span><span>${l.bmin?"Yes":"No"}</span></div>
+          <div><span>Workplace given</span><span>${l.work!=="—"?l.work:"No"}</span></div>
+          <div><span>Purpose</span><span>${l.purpose}</span></div>
+          <div><span>Loan</span><span>${l.loan}</span></div>
+        </div>
+      </div>
+      <div>
+        <h4>Latest requirement</h4>
+        <div class="kv">
+          <div><span>Budget</span><span>${l.bmin?inr(l.bmin)+" – "+inr(l.bmax):"Not shared"}</span></div>
+          <div><span>Configuration</span><span>${l.bhk}</span></div>
+          <div><span>Localities</span><span>${l.locs}</span></div>
+          <div><span>Works at</span><span>${l.work}</span></div>
+        </div>
+        <p class="tiny" style="margin-top:8px">From the newest <code style="font-family:'IBM Plex Mono',monospace">lead_requirements</code> row. Older ones are kept.</p>
+      </div>
+      <div>
+        <h4>History</h4>
+        <div class="timeline">
+          ${l.acts.map(a => `<div><span class="dot ${a[2]?"":"grey"}"></span>
+            <span>${a[0]}<br><span class="tiny">${a[1]}</span></span></div>`).join("")}
+        </div>
+      </div>
+    </div>
+  </td></tr>`).join("");
+
+$$("tr.lead").forEach(tr => tr.addEventListener("click", () => {
+  const i = tr.dataset.i, row = $("#d"+i);
+  const open = tr.getAttribute("aria-expanded") === "true";
+  tr.setAttribute("aria-expanded", String(!open));
+  row.hidden = open;
+}));
+</script>

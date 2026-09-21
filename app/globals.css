@@ -1,0 +1,116 @@
+/* =====================================================================
+   Design tokens — ported from property-console.html
+   Drop this in as app/globals.css, replacing whatever create-next-app
+   generated. Everything below the tokens is Tailwind's standard setup.
+   ===================================================================== */
+
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    /* surfaces */
+    --paper:      #F2F4F2;
+    --surface:    #FFFFFF;
+    --surface-2:  #E9EDEA;
+    --surface-3:  #DFE5E1;
+
+    /* text */
+    --ink:        #151C19;
+    --ink-2:      #4A554F;
+    --ink-3:      #78857E;
+
+    /* lines */
+    --line:       #D3DBD6;
+    --line-2:     #BCC7C1;
+
+    /* brand accent — deep teal-green */
+    --accent:      #0E6B58;
+    --accent-ink:  #FFFFFF;
+    --accent-soft: #D9EAE4;
+
+    /* semantic — separate from the accent on purpose */
+    --warn:      #8A5410;   /* RERA notices, cautions */
+    --warn-soft: #F7E9D4;
+    --crit:      #94292C;   /* private/staff-only data, errors */
+    --crit-soft: #F6DEDE;
+    --good:      #0E6B58;
+    --good-soft: #D9EAE4;
+
+    --radius: 10px;
+    --shadow: 0 1px 2px rgba(20,32,27,.06), 0 4px 14px rgba(20,32,27,.05);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --paper:      #0E1412;
+      --surface:    #161E1B;
+      --surface-2:  #1D2724;
+      --surface-3:  #25312D;
+      --ink:        #E7EEEA;
+      --ink-2:      #A6B4AD;
+      --ink-3:      #7A8880;
+      --line:       #293430;
+      --line-2:     #37443F;
+      --accent:      #3FBFA0;
+      --accent-ink:  #06211B;
+      --accent-soft: #11302A;
+      --warn:      #D6A264;
+      --warn-soft: #31250F;
+      --crit:      #E38686;
+      --crit-soft: #351B1B;
+      --good:      #3FBFA0;
+      --good-soft: #11302A;
+      --shadow: 0 1px 2px rgba(0,0,0,.4), 0 4px 14px rgba(0,0,0,.28);
+    }
+  }
+
+  :root[data-theme="dark"] {
+    --paper:      #0E1412;
+    --surface:    #161E1B;
+    --surface-2:  #1D2724;
+    --surface-3:  #25312D;
+    --ink:        #E7EEEA;
+    --ink-2:      #A6B4AD;
+    --ink-3:      #7A8880;
+    --line:       #293430;
+    --line-2:     #37443F;
+    --accent:      #3FBFA0;
+    --accent-ink:  #06211B;
+    --accent-soft: #11302A;
+    --warn:      #D6A264;
+    --warn-soft: #31250F;
+    --crit:      #E38686;
+    --crit-soft: #351B1B;
+    --good:      #3FBFA0;
+    --good-soft: #11302A;
+    --shadow: 0 1px 2px rgba(0,0,0,.4), 0 4px 14px rgba(0,0,0,.28);
+  }
+
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--font-ibm-plex-sans), -apple-system, BlinkMacSystemFont,
+                 "Segoe UI", Roboto, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  h1, h2, h3 {
+    font-family: var(--font-bricolage), var(--font-ibm-plex-sans), sans-serif;
+    letter-spacing: -0.015em;
+    text-wrap: balance;
+  }
+
+  .font-mono-plex {
+    font-family: var(--font-ibm-plex-mono), ui-monospace, monospace;
+  }
+
+  /* Prices, areas and any column of digits */
+  .tabular { font-variant-numeric: tabular-nums; }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+}
